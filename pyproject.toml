@@ -1,0 +1,20 @@
+[project]
+name = "invima-hematooncologia"
+version = "0.2.0"
+description = "Local INVIMA, UNIRS and POS Populi lookup tool for hemato-oncology medication review in Colombia."
+requires-python = ">=3.11"
+authors = [
+  { name = "Martin Munive" }
+]
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["invima", "oncology", "hematology", "colombia", "sqlite", "clinical-informatics"]
+
+[project.scripts]
+invima-tool = "invima_tool.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

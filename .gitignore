@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Local application state
+data/
+*.sqlite
+*.sqlite3
+*.db
+
+# Raw downloaded or manually exported source files.
+# These can include official pages, spreadsheets, local exports, CAPTCHA-session
+# artifacts or files whose redistribution status must be reviewed separately.
+Datos brutos/
+raw/
+fixtures/private/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+
+# Frontend artifacts for the future web app
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+

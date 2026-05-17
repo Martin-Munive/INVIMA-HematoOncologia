@@ -91,13 +91,20 @@ cd INVIMA-HematoOncologia
 Instalar en modo editable:
 
 ```powershell
-python -m pip install -e .
+python -m venv .INVIMA
+.\.INVIMA\Scripts\python.exe -m pip install -e .
 ```
 
 Ejecutar ayuda:
 
 ```powershell
-python run_cli.py --help
+.\.INVIMA\Scripts\python.exe run_cli.py --help
+```
+
+Para instalar tambien las dependencias de la API local:
+
+```powershell
+.\.INVIMA\Scripts\python.exe -m pip install -e ".[api]"
 ```
 
 ## Uso basico
@@ -105,31 +112,60 @@ python run_cli.py --help
 Consultar un medicamento en la base local:
 
 ```powershell
-python run_cli.py query PACLITAXEL
+.\.INVIMA\Scripts\python.exe run_cli.py query PACLITAXEL
 ```
 
 Generar reporte consolidado:
 
 ```powershell
-python run_cli.py report PACLITAXEL --only-vigente
+.\.INVIMA\Scripts\python.exe run_cli.py report PACLITAXEL --only-vigente
 ```
+
+## API local
+
+La API expone la misma logica del reporte CLI como un endpoint HTTP local. Esto permite que una interfaz web consulte la informacion sin leer SQLite directamente.
+
+Arrancar servidor:
+
+```powershell
+.\.INVIMA\Scripts\python.exe run_api.py
+```
+
+Consultar salud del servicio:
+
+```text
+http://127.0.0.1:8000/api/health
+```
+
+Consultar reporte de un medicamento:
+
+```text
+http://127.0.0.1:8000/api/drugs/PACLITAXEL/report?only_vigente=true
+```
+
+En terminos simples:
+
+- la base SQLite guarda los datos locales;
+- la funcion de reporte consulta SQLite y arma un diccionario estructurado;
+- FastAPI convierte ese diccionario en JSON;
+- el futuro frontend React/Vite llamara ese endpoint y lo mostrara como ficha visual.
 
 Importar perfil manual oncologico:
 
 ```powershell
-python run_cli.py import-manual "C:\ruta\MEDICAMENTOS ONCOLOGIA.txt" --query PACLITAXEL
+.\.INVIMA\Scripts\python.exe run_cli.py import-manual "C:\ruta\MEDICAMENTOS ONCOLOGIA.txt" --query PACLITAXEL
 ```
 
 Importar resultados INVIMA previamente guardados despues de resolver el CAPTCHA manualmente:
 
 ```powershell
-python run_cli.py import-invima-results "C:\ruta\resultado_invima.html" --only-vigente --fetch-details
+.\.INVIMA\Scripts\python.exe run_cli.py import-invima-results "C:\ruta\resultado_invima.html" --only-vigente --fetch-details
 ```
 
 Completar detalles desde registros ya importados:
 
 ```powershell
-python run_cli.py fetch-details-from-db PACLITAXEL --only-vigente
+.\.INVIMA\Scripts\python.exe run_cli.py fetch-details-from-db PACLITAXEL --only-vigente
 ```
 
 ## Fuentes de informacion
@@ -178,7 +214,7 @@ Motivos:
 Ejecutar:
 
 ```powershell
-python -m unittest discover -s tests -v
+.\.INVIMA\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
 Algunas pruebas usan fixtures locales no incluidos en el repositorio publico. Si esos archivos no existen, se omiten de forma controlada.
@@ -221,4 +257,3 @@ Medico General. Analista y programador de software.
 ## Licencia
 
 El codigo del repositorio se distribuye bajo licencia MIT, salvo que un archivo especifico indique otra cosa.
-

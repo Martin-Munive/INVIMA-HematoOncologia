@@ -10,6 +10,13 @@ readme = "README.md"
 license = { text = "MIT" }
 keywords = ["invima", "oncology", "hematology", "colombia", "sqlite", "clinical-informatics"]
 
+[project.optional-dependencies]
+api = [
+  "fastapi>=0.110",
+  "httpx>=0.27",
+  "uvicorn>=0.27",
+]
+
 [project.scripts]
 invima-tool = "invima_tool.cli:main"
 

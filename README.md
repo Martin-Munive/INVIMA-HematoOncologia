@@ -150,6 +150,36 @@ En terminos simples:
 - FastAPI convierte ese diccionario en JSON;
 - el futuro frontend React/Vite llamara ese endpoint y lo mostrara como ficha visual.
 
+## Interfaz web local
+
+El frontend vive en `app/` y consulta la API local.
+
+Instalar dependencias:
+
+```powershell
+cd app
+npm install
+```
+
+Arrancar la API desde la raiz del proyecto:
+
+```powershell
+.\.INVIMA\Scripts\python.exe run_api.py
+```
+
+Arrancar la interfaz:
+
+```powershell
+cd app
+npm run dev
+```
+
+Abrir:
+
+```text
+http://127.0.0.1:5173
+```
+
 Importar perfil manual oncologico:
 
 ```powershell

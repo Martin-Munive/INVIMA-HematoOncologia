@@ -242,8 +242,7 @@ Notas operativas:
 Documentos relacionados:
 
 - `docs/COMMERCIAL_LEGAL_NOTES.md`
-- `docs/UI_CLINICAL_PRESENTATION_NOTES.md`
-- `docs/PACLITAXEL_WORKFLOW.md`
+- `docs/DATA_SOURCES.md`
 
 ## Datos locales y privacidad
 
@@ -301,7 +300,7 @@ Componentes principales:
 
 ## Roadmap
 
-1. Procesar los medicamentos del documento manual usando `docs/PACLITAXEL_WORKFLOW.md`.
+1. Procesar progresivamente los medicamentos del documento manual.
 2. Procesar medicamentos UNIRS no repetidos despues de terminar la cola manual.
 3. Agregar trazabilidad detallada de fuente, fecha y tipo de evidencia.
 4. Integrar importadores visuales para INVIMA, manual y fuentes complementarias.

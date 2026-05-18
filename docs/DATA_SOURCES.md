@@ -1,78 +1,44 @@
-# Fuentes y trazabilidad
+# Sources and traceability
 
-## Proposito
+## Purpose
 
-Este documento define como debe interpretarse cada fuente dentro de `INVIMA-HematoOncologia`.
+This document describes how `INVIMA-HematoOncologia` separates official regulatory data, complementary coverage data, local clinical notes and scientific safety references.
 
-## Principio central
+## Central rule
 
-No todas las fuentes tienen la misma autoridad.
+Not all sources have the same authority.
 
-Una indicacion solo puede mostrarse como **INVIMA** si fue extraida de una fuente INVIMA real. Otras fuentes pueden complementar, contrastar o enriquecer la ficha, pero no reemplazan la autoridad regulatoria.
+An indication is shown as an **INVIMA indication** only when it comes from an INVIMA source. Other sources may complement, contrast or enrich the medication profile, but they do not replace regulatory authority.
 
-## Regla de adopcion de fuentes nuevas
+## Source hierarchy
 
-Toda fuente nueva que pueda cambiar una conclusion regulatoria, clinica, de cobertura o comercial activa `LINTERNA` antes de implementarse como fuente primaria.
+1. **INVIMA**: primary source for sanitary registration, regulatory status and indication by product or presentation.
+2. **POS Populi**: source for UPC coverage or financing information.
+3. **UNIRS**: complementary source for enabled or referenced indications.
+4. **Local oncology profile**: curated local source for mechanism, adverse reactions, extravasation and summarized clinical notes.
+5. **Scientific literature and official drug monographs**: source for mechanism, toxicity, hypersensitivity, anaphylaxis and management when curated for a specific medication.
 
-Antes de programar contra esa fuente debe quedar respondido:
+## INVIMA access limits
 
-1. Que fuente es y quien la publica.
-2. Si es oficial, secundaria, espejo, archivo historico o fuente privada.
-3. Que campos contiene y que campos no contiene.
-4. Frecuencia de actualizacion o evidencia disponible de vigencia.
-5. Licencia, terminos de uso y restricciones de automatizacion.
-6. Diferencias frente a la consulta web INVIMA.
-7. Riesgo de datos incompletos o desactualizados.
-8. Decision propuesta: adoptar, adoptar como complementaria, usar solo para contraste, investigar mas o rechazar.
+The public INVIMA search flow may include CAPTCHA or other access controls. This project does not implement CAPTCHA bypass, evasion tooling or circumvention of access controls.
 
-La adopcion como fuente primaria requiere aprobacion explicita del usuario. Hasta entonces debe tratarse como candidata.
+Allowed local workflow:
 
-## Jerarquia operativa
+1. manual search by the user;
+2. manual CAPTCHA resolution when required;
+3. local import of a saved page or a permitted technical export;
+4. structured storage in SQLite;
+5. source and limitation display in the report.
 
-1. **INVIMA**: fuente primaria para registro sanitario, estado regulatorio e indicacion por producto o presentacion.
-2. **POS Populi**: fuente de cobertura o financiacion UPC.
-3. **UNIRS**: fuente complementaria de indicaciones.
-4. **Perfil manual oncologico**: fuente curada local para mecanismo, seguridad, extravasacion e indicaciones resumidas.
-5. **Literatura cientifica**: fuente futura para completar mecanismo, toxicidad, hipersensibilidad, anafilaxia y manejo, siempre con cita separada.
+## Local data excluded from the repository
 
-## Fuente candidata: Datos Abiertos CUM de INVIMA
-
-Estado: candidata, pendiente de comparacion tecnica contra la consulta web por medicamento antes de adopcion primaria.
-
-Hallazgo preliminar:
-
-- El portal Datos Abiertos Colombia publica datasets atribuidos a INVIMA para Codigo Unico de Medicamentos.
-- La fuente puede servir para escalar registros, estados, productos, titulares y presentaciones sin guardar manualmente una pagina por medicamento.
-- Aun no debe asumirse que contiene todas las indicaciones clinicas detalladas que aparecen en la consulta web por presentacion.
-- Debe compararse contra PACLITAXEL y GOSERELINA antes de reemplazar el flujo HTML post-CAPTCHA.
-
-Decision provisional:
-
-- usarla solo como fuente candidata de investigacion;
-- no declarar completitud INVIMA desde ella hasta validar campos, actualizacion y concordancia;
-- conservar la consulta web/detalle por expediente como fuente de indicaciones si Datos Abiertos no las contiene.
-
-## Regla de seguridad
-
-El sistema no debe automatizar bypass de CAPTCHA ni ruptura de controles de acceso.
-
-Flujo permitido para INVIMA:
-
-1. el usuario consulta manualmente;
-2. el usuario resuelve CAPTCHA;
-3. el usuario guarda HTML o exporta una solicitud permitida;
-4. el sistema importa y estructura la informacion;
-5. el sistema declara fuente y limite.
-
-## Datos excluidos del repositorio
-
-No se publican por defecto:
+The repository does not publish by default:
 
 - `data/`;
 - `Datos brutos/`;
-- bases SQLite;
-- HTML descargado;
-- XLSX de terceros;
-- archivos exportados desde sesiones web.
+- SQLite databases;
+- downloaded HTML;
+- third-party spreadsheets;
+- browser exports or session artifacts.
 
-Estos archivos pueden usarse localmente, pero requieren auditoria antes de cualquier publicacion.
+These files may be used locally, but they require review before redistribution.

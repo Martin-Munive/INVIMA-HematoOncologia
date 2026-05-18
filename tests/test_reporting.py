@@ -16,6 +16,12 @@ class ReportingTests(unittest.TestCase):
         self.assertEqual(_query_terms("ACETATO DE GOSERELINA"), ["ACETATO DE GOSERELINA", "GOSERELINA"])
         self.assertEqual(_query_terms("ACIDO ZOLEDRONICO"), ["ACIDO ZOLEDRONICO", "ZOLEDRONICO"])
 
+    def test_report_shape_includes_open_cum_fields(self):
+        report = build_drug_report(DB_PATH, "PACLITAXEL", only_vigente=True)
+        self.assertIn("open_cum_count", report["invima"])
+        self.assertIn("open_cum", report["invima"])
+        self.assertIn("registration_source", report["source_policy"])
+
     def test_paclitaxel_report_shape_when_local_db_exists(self):
         if not DB_PATH.exists():
             raise unittest.SkipTest("Base SQLite local no incluida en el repositorio publico")

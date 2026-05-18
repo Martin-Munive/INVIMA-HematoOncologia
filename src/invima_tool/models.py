@@ -34,6 +34,39 @@ class InvimaDetail:
 
 
 @dataclass(frozen=True)
+class InvimaCumRecord:
+    expediente: str
+    producto: str
+    titular: str
+    registro_sanitario: str
+    fecha_expedicion: str
+    fecha_vencimiento: str
+    estado_registro: str
+    expediente_cum: str
+    consecutivo_cum: str
+    cantidad_cum: str
+    descripcion_comercial: str
+    estado_cum: str
+    fecha_activo: str
+    fecha_inactivo: str
+    muestra_medica: str
+    unidad: str
+    atc: str
+    descripcion_atc: str
+    via_administracion: str
+    concentracion: str
+    principio_activo: str
+    unidad_medida: str
+    cantidad: str
+    unidad_referencia: str
+    forma_farmaceutica: str
+    nombre_rol: str
+    tipo_rol: str
+    modalidad: str
+    ium: str
+
+
+@dataclass(frozen=True)
 class UnirsIndication:
     principio_activo: str
     dci_concentracion: str

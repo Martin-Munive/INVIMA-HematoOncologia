@@ -61,17 +61,18 @@ Implementado:
 - parser de UNIRS desde XLSX;
 - parser de POS Populi desde HTML guardado;
 - parser de documento manual oncologico;
+- importador de CUM vigentes desde Datos Abiertos Colombia para registros y presentaciones;
 - base local SQLite;
 - comandos de importacion, consulta y reporte;
 - API local FastAPI;
-- frontend React/Vite con resumen regulatorio, UNIRS integrado y seguridad clinica curada para PACLITAXEL;
+- frontend React/Vite con resumen regulatorio, presentaciones CUM, UNIRS integrado y seguridad clinica curada para PACLITAXEL;
 - pruebas unitarias iniciales;
 - reporte consolidado funcional para `PACLITAXEL` en el entorno local de desarrollo.
 
 Pendiente:
 
 - importador de HAR o `Copy as cURL` para flujos post-CAPTCHA;
-- trazabilidad ampliada de fuentes y fechas;
+- trazabilidad ampliada de fuente primaria para indicaciones INVIMA;
 - procesamiento progresivo de mas medicamentos.
 
 ## Instalacion local
@@ -198,6 +199,14 @@ Completar detalles desde registros ya importados:
 .\.INVIMA\Scripts\python.exe run_cli.py fetch-details-from-db PACLITAXEL --only-vigente
 ```
 
+Importar registros y presentaciones vigentes desde Datos Abiertos Colombia CUM:
+
+```powershell
+.\.INVIMA\Scripts\python.exe run_cli.py import-open-cum PACLITAXEL
+```
+
+Este comando ayuda a poblar rapidamente la base local para busquedas y pruebas visuales. La fuente CUM aporta registros, estados y presentaciones; no debe usarse como texto de indicacion INVIMA cuando el detalle regulatorio no este disponible.
+
 ## Fuentes de informacion
 
 ### INVIMA
@@ -211,6 +220,12 @@ El formulario de busqueda principal puede usar CAPTCHA. Este proyecto no impleme
 3. guardado de HTML o exportacion tecnica permitida;
 4. importacion local;
 5. descarga de detalles cuando existen `expediente` y `cdgprod`.
+
+### Datos Abiertos Colombia CUM
+
+Fuente tecnica para registros y presentaciones vigentes publicadas como conjunto abierto. Se usa para poblar la base local con expediente, producto, registro sanitario, estado, forma farmaceutica, via, concentracion y titular cuando no se ha importado todavia el detalle HTML de INVIMA.
+
+Esta fuente no reemplaza el texto de indicacion INVIMA del detalle regulatorio. En la interfaz se muestra como presentaciones CUM y debe mantenerse separada de las indicaciones autorizadas.
 
 ### UNIRS
 

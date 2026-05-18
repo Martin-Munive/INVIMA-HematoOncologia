@@ -10,6 +10,7 @@ from pathlib import Path
 from .invima_client import fetch_invima_detail_by_expediente
 from .invima_parser import parse_invima_detail_html, parse_invima_results_html
 from .manual_parser import parse_manual_file
+from .open_data_client import fetch_cum_vigentes
 from .pospopuli_parser import parse_pospopuli_results_html
 from .storage import (
     connect,
@@ -19,6 +20,7 @@ from .storage import (
     upsert_manual_profiles,
     upsert_invima_detail,
     upsert_invima_registrations,
+    upsert_invima_open_cum,
 )
 from .reporting import build_drug_report
 from .text import normalize_key
@@ -283,6 +285,24 @@ def cmd_import_manual(args: argparse.Namespace) -> None:
     )
 
 
+def cmd_import_open_cum(args: argparse.Namespace) -> None:
+    DATA_DIR.mkdir(exist_ok=True)
+    con = connect(DB_PATH)
+    init_db(con)
+    rows = fetch_cum_vigentes(args.query, limit=args.limit, timeout=args.timeout)
+    upsert_invima_open_cum(con, rows)
+    _print_json(
+        {
+            "query": args.query,
+            "source": "datos.gov.co:i7cb-raxc",
+            "cum_rows_imported": len(rows),
+            "unique_expedientes": len({row.expediente for row in rows if row.expediente}),
+            "products": sorted({row.producto for row in rows if row.producto})[:20],
+            "note": "CUM open data contains registrations/presentations. INVIMA indication text still requires detail source when not present in CUM.",
+        }
+    )
+
+
 def cmd_report(args: argparse.Namespace) -> None:
     _print_json(build_drug_report(DB_PATH, args.query, only_vigente=args.only_vigente))
 
@@ -329,6 +349,12 @@ def build_parser() -> argparse.ArgumentParser:
     manual.add_argument("path")
     manual.add_argument("--query", default="")
     manual.set_defaults(func=cmd_import_manual)
+
+    open_cum = sub.add_parser("import-open-cum")
+    open_cum.add_argument("query")
+    open_cum.add_argument("--limit", type=int, default=5000)
+    open_cum.add_argument("--timeout", type=int, default=60)
+    open_cum.set_defaults(func=cmd_import_open_cum)
 
     report = sub.add_parser("report")
     report.add_argument("query")

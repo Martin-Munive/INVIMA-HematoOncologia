@@ -29,6 +29,40 @@ type InvimaDetail = {
   indicaciones: string;
 };
 
+type InvimaOpenCum = {
+  expediente: string;
+  producto: string;
+  titular: string;
+  registro_sanitario: string;
+  fecha_expedicion: string;
+  fecha_vencimiento: string;
+  estado_registro: string;
+  expediente_cum: string;
+  consecutivo_cum: string;
+  cantidad_cum: string;
+  descripcion_comercial: string;
+  estado_cum: string;
+  fecha_activo: string;
+  fecha_inactivo: string;
+  muestra_medica: string;
+  unidad: string;
+  atc: string;
+  descripcion_atc: string;
+  via_administracion: string;
+  concentracion: string;
+  principio_activo: string;
+  unidad_medida: string;
+  cantidad: string;
+  unidad_referencia: string;
+  forma_farmaceutica: string;
+  nombre_rol: string;
+  tipo_rol: string;
+  modalidad: string;
+  ium: string;
+  source_dataset: string;
+  imported_at: string;
+};
+
 type UnirsItem = {
   principio_activo: string;
   dci_concentracion: string;
@@ -73,6 +107,8 @@ type DrugReport = {
     registration_counts: { estado: string; n: number }[];
     details_count: number;
     details: InvimaDetail[];
+    open_cum_count: number;
+    open_cum: InvimaOpenCum[];
   };
   unirs: { count: number; items: UnirsItem[] };
   pospopuli: { count: number; items: PosPopuliItem[] };
@@ -147,6 +183,15 @@ function displayConcentration(presentation: { producto: string; concentracion: s
   const numeric = cleanNumber(presentation.concentracion);
   if (numeric) return `${numeric} (campo INVIMA)`;
   return presentation.forma_farmaceutica || 'Sin dato';
+}
+
+function displayCumConcentration(item: InvimaOpenCum) {
+  const amount = cleanNumber(item.cantidad);
+  const unit = item.unidad_medida || item.unidad;
+  const reference = item.unidad_referencia;
+  if (amount && unit && reference) return `${amount} ${unit} / ${reference}`;
+  if (amount && unit) return `${amount} ${unit}`;
+  return displayConcentration(item);
 }
 
 function buildRegulatorySummary(details: InvimaDetail[]) {
@@ -247,6 +292,7 @@ function App() {
   const financed = Boolean(report?.pospopuli.items.some((item) => item.financiacion));
   const complete = Boolean(report?.completion.is_complete_for_current_sources);
   const firstDetail = report?.invima.details[0];
+  const firstCum = report?.invima.open_cum[0];
   const regulatorySummary = report ? buildRegulatorySummary(report.invima.details) : [];
   const unirsSummary = report ? buildUnirsSummary(report.unirs.items) : [];
 
@@ -291,13 +337,13 @@ function App() {
               </div>
               <div className="metric">
                 <Database size={22} />
-                <span>INVIMA vigente</span>
-                <strong>{report.invima.details_count}</strong>
+                <span>INVIMA local</span>
+                <strong>{report.invima.details_count || report.invima.open_cum_count}</strong>
               </div>
               <div className="metric">
                 <FlaskConical size={22} />
                 <span>ATC principal</span>
-                <strong>{firstDetail?.atc || 'Sin dato'}</strong>
+                <strong>{firstDetail?.atc || firstCum?.atc || 'Sin dato'}</strong>
               </div>
             </section>
 
@@ -338,6 +384,33 @@ function App() {
                   </div>
                 ) : (
                   <EmptyState text="No se detectaron patologias en el texto local de indicaciones INVIMA." />
+                )}
+                <div className="subsection-title">Presentaciones CUM vigentes en Datos Abiertos</div>
+                {report.invima.open_cum.length ? (
+                  <div className="cum-list">
+                    {report.invima.open_cum.map((item) => (
+                      <details className="detail-row cum-row" key={`${item.expediente}-${item.consecutivo_cum}-${item.ium || item.producto}`}>
+                        <summary className="detail-head">
+                          <ChevronDown size={15} aria-hidden="true" />
+                          <strong>{item.producto}</strong>
+                          <span>{displayCumConcentration(item)}</span>
+                          <small>Abrir CUM</small>
+                        </summary>
+                        <div className="detail-meta">
+                          <span>{item.registro_sanitario}</span>
+                          <span>{item.estado_registro} / CUM {item.estado_cum}</span>
+                          <span>{item.forma_farmaceutica || 'Sin forma'}</span>
+                          <span>{item.via_administracion || 'Sin via'}</span>
+                        </div>
+                        <p><strong>Titular:</strong> {item.titular || 'Sin dato'}</p>
+                        <p><strong>Principio activo:</strong> {item.principio_activo || 'Sin dato'}</p>
+                        <p><strong>Presentacion:</strong> {item.descripcion_comercial || 'Sin descripcion comercial'}</p>
+                        <p><strong>Fuente:</strong> {item.source_dataset} · importado localmente {item.imported_at || 'sin fecha'}</p>
+                      </details>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState text="No hay presentaciones CUM importadas desde Datos Abiertos para este medicamento." />
                 )}
                 <div className="subsection-title">UNIRS en el mismo informe</div>
                 {unirsSummary.length ? (

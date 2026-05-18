@@ -47,6 +47,23 @@ type PosPopuliItem = {
   financiacion: string;
 };
 
+type ClinicalSafety = {
+  drug: string;
+  source_status: string;
+  sources: { label: string; url: string }[];
+  adverse_reactions_by_system: { system: string; items: string[] }[];
+  hypersensitivity: {
+    risk: string;
+    prevention: string[];
+    management: string[];
+  };
+  extravasation: {
+    classification: string;
+    prevention: string[];
+    management: string[];
+  };
+} | null;
+
 type DrugReport = {
   query: string;
   only_vigente: boolean;
@@ -59,6 +76,7 @@ type DrugReport = {
   };
   unirs: { count: number; items: UnirsItem[] };
   pospopuli: { count: number; items: PosPopuliItem[] };
+  clinical_safety: ClinicalSafety;
   source_policy: Record<string, string>;
 };
 
@@ -74,6 +92,15 @@ type RegulatoryIndicationSummary = {
   }[];
 };
 
+type UnirsIndicationSummary = {
+  label: string;
+  items: {
+    dci_concentracion: string;
+    forma_farmaceutica: string;
+    tipo_indicacion: string;
+  }[];
+};
+
 const INDICATION_PATTERNS: { label: string; pattern: RegExp }[] = [
   { label: 'Cancer de mama metastasico', pattern: /CANCER DE MAMA METASTASICO/i },
   { label: 'Cancer de mama', pattern: /CANCER DE MAMA(?! METASTASICO)|CARCINOMA DE MAMA|CARCINOMA AVANZADO DE SENO/i },
@@ -81,6 +108,16 @@ const INDICATION_PATTERNS: { label: string; pattern: RegExp }[] = [
   { label: 'Cancer de pulmon no microcitico / NSCLC', pattern: /CANCER DE PULMON NO MICROCITICO|CANCER DE PULMON DE CELULAS NO[- ]PEQUENAS|NSCLC/i },
   { label: 'Adenocarcinoma de pancreas metastasico', pattern: /ADENOCARCINOMA DE PANCREAS METASTASICO/i },
   { label: 'Sarcoma de Kaposi relacionado con SIDA', pattern: /SARCOMA DE KAPOSI/i },
+];
+
+const UNIRS_INDICATION_PATTERNS: { label: string; pattern: RegExp }[] = [
+  ...INDICATION_PATTERNS,
+  { label: 'Adenocarcinoma de primario desconocido', pattern: /ADENOCARCINOMA DE PRIMARIO DESCONOCIDO|CARCINOMAS? DE ORIGEN PRIMARIO DESCONOCIDO/i },
+  { label: 'Cancer de cervix', pattern: /CANCER DE CERVIX|CANCER CERVIX/i },
+  { label: 'Cancer de endometrio', pattern: /CANCER DE ENDOMETRIO/i },
+  { label: 'Cancer de esofago', pattern: /CANCER ESOFAGO|CANCER DE ESOFAGO/i },
+  { label: 'Cancer gastrico', pattern: /CANCER GASTRICO/i },
+  { label: 'Malignidad timica / timoma', pattern: /MALIGNIDAD TIMICA|TIMOMAS?|CARCINOMAS TIMICOS/i },
 ];
 
 function statusClass(ok: boolean) {
@@ -96,6 +133,20 @@ function splitBullets(text: string) {
 
 function normalizeSearchText(text: string) {
   return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+}
+
+function cleanNumber(value: string) {
+  if (!value) return '';
+  return value.replace(',', '.').replace(/\.?0+$/, '');
+}
+
+function displayConcentration(presentation: { producto: string; concentracion: string; forma_farmaceutica: string }) {
+  const productText = presentation.producto.replace(/\s+/g, ' ').trim();
+  const match = productText.match(/\b\d+(?:[.,]\d+)?\s*(?:MG|MCG|G|UI|U)(?:\s*\/\s*\d+(?:[.,]\d+)?\s*(?:ML|L|U))?/i);
+  if (match) return match[0].toUpperCase();
+  const numeric = cleanNumber(presentation.concentracion);
+  if (numeric) return `${numeric} (campo INVIMA)`;
+  return presentation.forma_farmaceutica || 'Sin dato';
 }
 
 function buildRegulatorySummary(details: InvimaDetail[]) {
@@ -122,6 +173,31 @@ function buildRegulatorySummary(details: InvimaDetail[]) {
   });
 
   return Array.from(grouped.values()).sort((a, b) => b.presentations.length - a.presentations.length || a.label.localeCompare(b.label));
+}
+
+function buildUnirsSummary(items: UnirsItem[]) {
+  const grouped = new Map<string, UnirsIndicationSummary>();
+
+  items.forEach((item) => {
+    const indicationText = normalizeSearchText(item.indicaciones || '');
+    UNIRS_INDICATION_PATTERNS.forEach(({ label, pattern }) => {
+      if (!pattern.test(indicationText)) return;
+      const current = grouped.get(label) ?? { label, items: [] };
+      const alreadyListed = current.items.some(
+        (entry) => entry.dci_concentracion === item.dci_concentracion && entry.tipo_indicacion === item.tipo_indicacion,
+      );
+      if (!alreadyListed) {
+        current.items.push({
+          dci_concentracion: item.dci_concentracion,
+          forma_farmaceutica: item.forma_farmaceutica,
+          tipo_indicacion: item.tipo_indicacion || 'Sin clasificacion',
+        });
+      }
+      grouped.set(label, current);
+    });
+  });
+
+  return Array.from(grouped.values()).sort((a, b) => b.items.length - a.items.length || a.label.localeCompare(b.label));
 }
 
 function Panel({ title, icon, children, className = '' }: { title: string; icon: React.ReactNode; children: React.ReactNode; className?: string }) {
@@ -172,6 +248,7 @@ function App() {
   const complete = Boolean(report?.completion.is_complete_for_current_sources);
   const firstDetail = report?.invima.details[0];
   const regulatorySummary = report ? buildRegulatorySummary(report.invima.details) : [];
+  const unirsSummary = report ? buildUnirsSummary(report.unirs.items) : [];
 
   return (
     <div className="app-shell">
@@ -234,12 +311,12 @@ function App() {
                 <div className="subsection-title">Patologias detectadas en indicaciones INVIMA vigentes</div>
                 {regulatorySummary.length ? (
                   <div className="regulatory-summary">
-                    {regulatorySummary.map((item) => (
-                      <article key={item.label} className="indication-summary-section">
-                        <div className="indication-summary-head">
+                    {regulatorySummary.map((item, index) => (
+                      <details key={item.label} className="indication-summary-section" open={index < 2}>
+                        <summary className="indication-summary-head">
                           <strong>{item.label}</strong>
                           <span>{item.presentations.length} presentaciones</span>
-                        </div>
+                        </summary>
                         <div className="presentation-list">
                           <div className="presentation-list-head">
                             <span>Producto</span>
@@ -249,29 +326,36 @@ function App() {
                           {item.presentations.map((presentation) => (
                             <div className="presentation-line" key={`${item.label}-${presentation.producto}-${presentation.registro_sanitario}`}>
                               <span>{presentation.producto}</span>
-                              <span>{presentation.concentracion || presentation.forma_farmaceutica || 'Sin dato'}</span>
+                              <span>{displayConcentration(presentation)}</span>
                               <span>{presentation.registro_sanitario}</span>
                             </div>
                           ))}
                         </div>
-                      </article>
+                      </details>
                     ))}
                   </div>
                 ) : (
                   <EmptyState text="No se detectaron patologias en el texto local de indicaciones INVIMA." />
                 )}
                 <div className="subsection-title">UNIRS en el mismo informe</div>
-                {report.unirs.items.length ? (
+                {unirsSummary.length ? (
                   <div className="unirs-summary-list">
-                    {report.unirs.items.map((item, index) => (
-                      <div className="unirs-summary-line" key={`${item.dci_concentracion}-${index}`}>
-                        <div>
-                          <strong>{item.dci_concentracion}</strong>
-                          <span>{item.forma_farmaceutica || 'Forma farmaceutica no reportada'}</span>
+                    {unirsSummary.map((item, index) => (
+                      <details className="unirs-summary-section" key={item.label} open={index < 2}>
+                        <summary className="indication-summary-head">
+                          <strong>{item.label}</strong>
+                          <span>{item.items.length} registros UNIRS</span>
+                        </summary>
+                        <div className="unirs-compact-list">
+                          {item.items.map((entry) => (
+                            <div className="unirs-compact-line" key={`${item.label}-${entry.dci_concentracion}-${entry.tipo_indicacion}`}>
+                              <span>{entry.dci_concentracion}</span>
+                              <span>{entry.forma_farmaceutica || 'Sin forma reportada'}</span>
+                              <span>{entry.tipo_indicacion}</span>
+                            </div>
+                          ))}
                         </div>
-                        <p>{item.indicaciones}</p>
-                        <span>{item.tipo_indicacion || 'Sin clasificacion'}</span>
-                      </div>
+                      </details>
                     ))}
                   </div>
                 ) : (
@@ -292,6 +376,37 @@ function App() {
                     {splitBullets(report.manual_profile.extravasacion).map((line) => <p key={line}>{line}</p>)}
                   </div>
                 ) : <EmptyState text="Sin perfil manual cargado." />}
+              </Panel>
+
+              <Panel title="Seguridad clinica curada" icon={<AlertTriangle size={16} />} className="span-2">
+                {report.clinical_safety ? (
+                  <div className="safety-layout">
+                    <div className="safety-column">
+                      <div className="subsection-title">Reacciones adversas por sistema</div>
+                      {report.clinical_safety.adverse_reactions_by_system.map((group) => (
+                        <details className="safety-group" key={group.system}>
+                          <summary>{group.system}</summary>
+                          <ul>
+                            {group.items.map((item) => <li key={item}>{item}</li>)}
+                          </ul>
+                        </details>
+                      ))}
+                    </div>
+                    <div className="safety-column">
+                      <div className="subsection-title">Hipersensibilidad / anafilaxia</div>
+                      <p>{report.clinical_safety.hypersensitivity.risk}</p>
+                      <ul>
+                        {[...report.clinical_safety.hypersensitivity.prevention, ...report.clinical_safety.hypersensitivity.management].map((item) => <li key={item}>{item}</li>)}
+                      </ul>
+                      <div className="subsection-title">Extravasacion / infiltracion</div>
+                      <p>{report.clinical_safety.extravasation.classification}</p>
+                      <ul>
+                        {[...report.clinical_safety.extravasation.prevention, ...report.clinical_safety.extravasation.management].map((item) => <li key={item}>{item}</li>)}
+                      </ul>
+                    </div>
+                    <div className="source-note">Fuentes curadas: {report.clinical_safety.sources.map((source) => source.label).join('; ')}.</div>
+                  </div>
+                ) : <EmptyState text="Sin inmersion cientifica curada para este medicamento." />}
               </Panel>
 
               <Panel title="Indicaciones INVIMA por presentacion" icon={<ShieldCheck size={16} />} className="span-2 tall">

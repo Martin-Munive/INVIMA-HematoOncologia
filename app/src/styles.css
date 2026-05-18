@@ -49,7 +49,7 @@ input {
 
 .brand-title {
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.04em;
   font-size: clamp(0.9rem, 2vw, 1.25rem);
 }
 
@@ -109,8 +109,7 @@ input {
   outline: none;
   font-size: 1rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .search-box button {
@@ -120,8 +119,7 @@ input {
   border-radius: 6px;
   padding: 10px 14px;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   cursor: pointer;
 }
 
@@ -161,8 +159,7 @@ input {
 .metric span {
   color: #94a3b8;
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
 }
 
 .metric strong {
@@ -213,8 +210,7 @@ input {
   border-bottom: 1px solid rgba(0, 229, 255, 0.18);
   background: linear-gradient(90deg, rgba(0, 229, 255, 0.14), transparent);
   color: #00e5ff;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.02em;
   font-size: 0.75rem;
   font-weight: 800;
 }
@@ -256,6 +252,12 @@ input {
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.indication-summary-head::-webkit-details-marker {
+  display: none;
 }
 
 .indication-summary-head strong {
@@ -290,8 +292,7 @@ input {
   color: #00e5ff;
   font-size: 0.72rem;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 
 .presentation-line {
@@ -319,31 +320,34 @@ input {
   margin-top: 8px;
 }
 
-.unirs-summary-line {
-  display: grid;
-  grid-template-columns: minmax(160px, 0.9fr) minmax(220px, 1.4fr) minmax(90px, 0.4fr);
-  gap: 12px;
-  align-items: start;
-  padding: 9px 0;
+.unirs-summary-section {
   border-top: 1px solid rgba(148, 163, 184, 0.14);
+  padding-top: 9px;
 }
 
-.unirs-summary-line strong {
-  display: block;
-  color: #f8fafc;
-  font-size: 0.86rem;
+.unirs-compact-list {
+  margin-top: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.unirs-summary-line span {
-  color: #00e5ff;
-  font-size: 0.75rem;
-}
-
-.unirs-summary-line p {
-  margin: 0;
+.unirs-compact-line {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.8fr) minmax(170px, 1fr) minmax(90px, 0.45fr);
+  gap: 10px;
+  padding: 7px 9px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
   color: #cbd5e1;
-  font-size: 0.86rem;
-  line-height: 1.45;
+  font-size: 0.82rem;
+}
+
+.unirs-compact-line:first-child {
+  border-top: none;
+}
+
+.unirs-compact-line span:last-child {
+  color: #00e5ff;
 }
 
 .warning-box {
@@ -372,8 +376,7 @@ input {
   color: #00e5ff;
   margin-top: 14px;
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.02em;
   font-weight: 800;
 }
 
@@ -455,6 +458,39 @@ input {
   color: #94a3b8;
 }
 
+.safety-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.safety-column p,
+.safety-column li {
+  color: #cbd5e1;
+  font-size: 0.88rem;
+  line-height: 1.48;
+}
+
+.safety-column ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.safety-group {
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 8px 0;
+}
+
+.safety-group summary {
+  color: #f8fafc;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.safety-layout .source-note {
+  grid-column: 1 / -1;
+}
+
 .legal-footer {
   width: min(1540px, 100%);
   margin: 0 auto;
@@ -483,7 +519,8 @@ input {
   }
 
   .presentation-line,
-  .unirs-summary-line {
+  .unirs-compact-line,
+  .safety-layout {
     grid-template-columns: 1fr;
     gap: 4px;
   }

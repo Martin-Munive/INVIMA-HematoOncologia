@@ -24,9 +24,9 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("invima", report)
         self.assertIn("unirs", report)
         self.assertIn("pospopuli", report)
+        self.assertIn("clinical_safety", report)
         self.assertIn("source_policy", report)
 
 
 if __name__ == "__main__":
     unittest.main()
-

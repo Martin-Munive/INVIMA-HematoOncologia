@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 import sqlite3
 
+from .clinical_profiles import get_clinical_safety_profile
 from .storage import connect, init_db
 
 
@@ -112,10 +113,12 @@ def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = F
         },
         "unirs": {"count": len(unirs), "items": unirs},
         "pospopuli": {"count": len(pos), "items": pos},
+        "clinical_safety": get_clinical_safety_profile(query),
         "source_policy": {
             "regulatory_indications_source": "INVIMA details only",
             "coverage_source": "POS Populi / UPC",
             "complementary_indications_source": "UNIRS",
             "manual_profile_source": "curated local oncology profile",
+            "clinical_safety_source": "curated external scientific sources when available",
         },
     }

@@ -29,9 +29,9 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(body["query"], "PACLITAXEL")
         self.assertIn("completion", body)
         self.assertIn("invima", body)
+        self.assertIn("clinical_safety", body)
         self.assertIn("source_policy", body)
 
 
 if __name__ == "__main__":
     unittest.main()
-

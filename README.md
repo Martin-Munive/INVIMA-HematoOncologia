@@ -22,6 +22,7 @@ Analista y programador de software
 - indicaciones complementarias UNIRS;
 - cobertura o financiacion POS Populi / UPC;
 - perfil manual oncologico curado: mecanismo, clase, efectos adversos, extravasacion, manejo e indicaciones resumidas;
+- perfil clinico curado por medicamento cuando exista inmersion cientifica validada;
 - trazabilidad de fuente para separar informacion regulatoria, complementaria y tecnica.
 
 La unidad principal no es solo el principio activo. Para decisiones regulatorias importan tambien expediente, producto, presentacion, registro sanitario, estado del registro e indicacion textual.
@@ -52,7 +53,7 @@ Una indicacion solo debe presentarse como **indicacion INVIMA** si proviene de u
 
 ## Estado del proyecto
 
-Estado actual: **prototipo local por CLI**.
+Estado actual: **prototipo local con CLI, API FastAPI e interfaz React/Vite**.
 
 Implementado:
 
@@ -62,14 +63,13 @@ Implementado:
 - parser de documento manual oncologico;
 - base local SQLite;
 - comandos de importacion, consulta y reporte;
+- API local FastAPI;
+- frontend React/Vite con resumen regulatorio, UNIRS integrado y seguridad clinica curada para PACLITAXEL;
 - pruebas unitarias iniciales;
 - reporte consolidado funcional para `PACLITAXEL` en el entorno local de desarrollo.
 
 Pendiente:
 
-- API local con FastAPI;
-- interfaz web React/Vite inspirada en el estilo de ER-IA;
-- ficha visual por medicamento;
 - importador de HAR o `Copy as cURL` para flujos post-CAPTCHA;
 - trazabilidad ampliada de fuentes y fechas;
 - procesamiento progresivo de mas medicamentos.
@@ -226,7 +226,23 @@ Fuente curada localmente para mecanismo, clase, eventos adversos, extravasacion,
 
 ### Literatura cientifica
 
-Se usara en una fase posterior para completar mecanismo de accion, toxicidad, hipersensibilidad, anafilaxia y manejo cuando el dato no provenga de INVIMA. Debe citarse de forma separada y nunca presentarse como autorizacion regulatoria.
+Se usa para completar mecanismo de accion, toxicidad, hipersensibilidad, anafilaxia y manejo cuando el dato no provenga de INVIMA. Debe citarse de forma separada y nunca presentarse como autorizacion regulatoria.
+
+## Orientacion comercial y legal
+
+El codigo puede evolucionar hacia una aplicacion comercial independiente, pero la aplicacion debe conservar atribucion, trazabilidad, separacion de fuentes y una formulacion clara de uso previsto. No debe sugerir aval oficial de INVIMA, Ministerio de Salud, OPS/OMS u otra entidad.
+
+Notas operativas:
+
+- INVIMA, UNIRS y POS Populi conservan la autoridad sobre sus datos oficiales.
+- La app no debe reemplazar criterio clinico, revision farmaceutica ni proceso regulatorio.
+- Si en el futuro automatiza decisiones clinicas o autorizaciones, debe evaluarse riesgo de software como dispositivo medico.
+- Para AIEPI/OPS, el uso comercial de materiales OPS probablemente requiere permiso especifico salvo licencia que permita expresamente uso comercial.
+
+Documentos relacionados:
+
+- `docs/COMMERCIAL_LEGAL_NOTES.md`
+- `docs/UI_CLINICAL_PRESENTATION_NOTES.md`
 
 ## Datos locales y privacidad
 
@@ -254,9 +270,20 @@ Algunas pruebas usan fixtures locales no incluidos en el repositorio publico. Si
 ```text
 run_cli.py
   -> invima_tool.cli
-  -> parsers / clients
+  -> invima_tool.reporting
+  -> parsers / clients / clinical_profiles
   -> SQLite local
   -> JSON operativo
+
+run_api.py
+  -> invima_tool.api
+  -> invima_tool.reporting
+  -> JSON HTTP
+
+app/
+  -> React/Vite
+  -> GET /api/drugs/{query}/report
+  -> ficha visual local
 ```
 
 Componentes principales:
@@ -267,6 +294,8 @@ Componentes principales:
 - `pospopuli_parser.py`: parsea resultados POS Populi desde HTML.
 - `manual_parser.py`: extrae perfil manual oncologico.
 - `storage.py`: inicializa y actualiza SQLite.
+- `reporting.py`: arma el reporte consolidado reusable para CLI/API.
+- `clinical_profiles.py`: perfiles de seguridad curados por medicamento cuando existe inmersion cientifica.
 - `cli.py`: define comandos de importacion, consulta y reporte.
 
 ## Roadmap

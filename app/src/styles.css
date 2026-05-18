@@ -280,6 +280,7 @@ input {
   color: #cbd5e1;
   font-size: 0.7rem;
   padding: 2px 8px;
+  animation: openCue 1.9s ease-in-out infinite;
 }
 
 .indication-summary-head svg,
@@ -554,6 +555,35 @@ input {
   font-size: 0.7rem;
   font-weight: 500;
   padding: 2px 8px;
+  animation: openCue 1.9s ease-in-out infinite;
+}
+
+.indication-summary-section[open] > .indication-summary-head small,
+.unirs-summary-section[open] > .indication-summary-head small,
+.safety-group[open] > summary small {
+  animation: none;
+}
+
+@keyframes openCue {
+  0%,
+  100% {
+    color: #cbd5e1;
+    border-color: rgba(0, 229, 255, 0.26);
+    background: rgba(2, 6, 23, 0.35);
+  }
+
+  50% {
+    color: #020617;
+    border-color: rgba(0, 255, 136, 0.72);
+    background: rgba(0, 255, 136, 0.82);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indication-summary-head small,
+  .safety-group summary small {
+    animation: none;
+  }
 }
 
 .safety-layout .source-note {

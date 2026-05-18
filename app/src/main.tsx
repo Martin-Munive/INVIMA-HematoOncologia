@@ -311,8 +311,8 @@ function App() {
                 <div className="subsection-title">Patologias detectadas en indicaciones INVIMA vigentes</div>
                 {regulatorySummary.length ? (
                   <div className="regulatory-summary">
-                    {regulatorySummary.map((item, index) => (
-                      <details key={item.label} className="indication-summary-section" open={index < 2}>
+                    {regulatorySummary.map((item) => (
+                      <details key={item.label} className="indication-summary-section">
                         <summary className="indication-summary-head">
                           <ChevronDown size={16} aria-hidden="true" />
                           <strong>{item.label}</strong>
@@ -342,8 +342,8 @@ function App() {
                 <div className="subsection-title">UNIRS en el mismo informe</div>
                 {unirsSummary.length ? (
                   <div className="unirs-summary-list">
-                    {unirsSummary.map((item, index) => (
-                      <details className="unirs-summary-section" key={item.label} open={index < 2}>
+                    {unirsSummary.map((item) => (
+                      <details className="unirs-summary-section" key={item.label}>
                         <summary className="indication-summary-head">
                           <ChevronDown size={16} aria-hidden="true" />
                           <strong>{item.label}</strong>

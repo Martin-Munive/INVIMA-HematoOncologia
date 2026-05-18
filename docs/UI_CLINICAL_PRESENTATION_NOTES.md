@@ -28,6 +28,9 @@ Healthcare dashboard usability literature repeatedly prioritizes easy navigation
 - UNIRS indications are summarized separately inside the same regulatory panel.
 - Full INVIMA and UNIRS text remains available in detailed panels.
 - PACLITAXEL has a curated safety profile by adverse reaction system plus hypersensitivity and extravasation management.
+- Desktop layout uses a two-column reading model: regulatory summary as the primary area, compact source/coverage panels on the side, and raw source text below as expandable audit sections.
+- Raw INVIMA and UNIRS text should stay collapsed by default to avoid long scrolling and preserve the summary-first workflow.
+- The footer reserves a visible brand area for Anaskai logo and ownership information.
 
 ## Sources reviewed
 

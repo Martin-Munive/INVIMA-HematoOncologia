@@ -302,7 +302,7 @@ function App() {
             </section>
 
             <section className="content-grid">
-              <Panel title="Resumen regulatorio" icon={<FileSearch size={16} />} className="span-2">
+              <Panel title="Resumen regulatorio" icon={<FileSearch size={16} />} className="regulatory-panel">
                 <div className="count-row">
                   {report.invima.registration_counts.map((item) => (
                     <span key={item.estado} className="count-chip">{item.estado}: {item.n}</span>
@@ -371,7 +371,7 @@ function App() {
                 )}
               </Panel>
 
-              <Panel title="Perfil clinico y seguridad" icon={<AlertTriangle size={16} />} className="span-2">
+              <Panel title="Perfil clinico y seguridad" icon={<AlertTriangle size={16} />} className="clinical-panel">
                 {report.clinical_safety || report.manual_profile ? (
                   <div className="safety-layout">
                     {report.manual_profile && (
@@ -422,26 +422,28 @@ function App() {
                 ) : <EmptyState text="Sin perfil clinico local ni inmersion cientifica curada para este medicamento." />}
               </Panel>
 
-              <Panel title="Indicaciones INVIMA por presentacion" icon={<ShieldCheck size={16} />} className="span-2 tall">
+              <Panel title="Indicaciones INVIMA por presentacion" icon={<ShieldCheck size={16} />} className="detail-panel">
                 <div className="table-list">
                   {report.invima.details.map((item) => (
-                    <article key={`${item.expediente}-${item.cdgprod}`} className="detail-row">
-                      <div className="detail-head">
+                    <details key={`${item.expediente}-${item.cdgprod}`} className="detail-row">
+                      <summary className="detail-head">
+                        <ChevronDown size={15} aria-hidden="true" />
                         <strong>{item.producto}</strong>
                         <span>{item.registro_sanitario}</span>
-                      </div>
+                        <small>Abrir fuente</small>
+                      </summary>
                       <div className="detail-meta">
                         <span>{item.forma_farmaceutica}</span>
                         <span>{item.principio_activo}</span>
                         <span>{item.concentracion}</span>
                       </div>
                       <p>{item.indicaciones}</p>
-                    </article>
+                    </details>
                   ))}
                 </div>
               </Panel>
 
-              <Panel title="UPC / POS Populi" icon={<BadgeCheck size={16} />}>
+              <Panel title="UPC / POS Populi" icon={<BadgeCheck size={16} />} className="side-panel">
                 {report.pospopuli.items.length ? report.pospopuli.items.map((item) => (
                   <div className="source-card" key={item.nombre}>
                     <strong>{item.nombre}</strong>
@@ -451,21 +453,25 @@ function App() {
                 )) : <EmptyState text="No hay resultados POS Populi locales." />}
               </Panel>
 
-              <Panel title="UNIRS" icon={<FlaskConical size={16} />} className="span-2">
+              <Panel title="UNIRS texto original" icon={<FlaskConical size={16} />} className="detail-panel">
                 {report.unirs.items.length ? (
                   <div className="unirs-grid">
                     {report.unirs.items.map((item, index) => (
-                      <div className="source-card" key={`${item.dci_concentracion}-${index}`}>
-                        <strong>{item.dci_concentracion}</strong>
+                      <details className="source-card source-detail" key={`${item.dci_concentracion}-${index}`}>
+                        <summary>
+                          <ChevronDown size={15} aria-hidden="true" />
+                          <strong>{item.dci_concentracion}</strong>
+                          <small>Abrir fuente</small>
+                        </summary>
                         <span>{item.tipo_indicacion || 'Sin color'}</span>
                         <p>{item.indicaciones}</p>
-                      </div>
+                      </details>
                     ))}
                   </div>
                 ) : <EmptyState text="No hay indicaciones UNIRS locales." />}
               </Panel>
 
-              <Panel title="Politica de fuentes" icon={<Database size={16} />}>
+              <Panel title="Politica de fuentes" icon={<Database size={16} />} className="side-panel">
                 <div className="source-policy">
                   {Object.entries(report.source_policy).map(([key, value]) => (
                     <p key={key}><strong>{key}</strong><span>{value}</span></p>
@@ -477,7 +483,15 @@ function App() {
         )}
       </main>
       <footer className="legal-footer">
-        INVIMA Hemato-Oncologia es una aplicacion independiente. Integra fuentes publicas y locales para apoyo informativo; no reemplaza la consulta de la fuente oficial, el criterio clinico ni los procesos regulatorios aplicables. INVIMA, UNIRS y POS Populi conservan la titularidad y autoridad sobre sus datos oficiales.
+        <div className="brand-mark">
+          <div className="logo-placeholder">Logo Anaskai</div>
+          <div>
+            <strong>INVIMA Hemato-Oncologia</strong>
+            <span>© 2026 Martin Munive / Anaskai. Todos los derechos reservados.</span>
+            <a href="https://www.anaskai.com" target="_blank" rel="noreferrer">www.anaskai.com</a>
+          </div>
+        </div>
+        <p>Aplicacion independiente. Integra fuentes publicas y locales para apoyo informativo; no reemplaza la consulta de la fuente oficial, el criterio clinico ni los procesos regulatorios aplicables. INVIMA, UNIRS y POS Populi conservan la titularidad y autoridad sobre sus datos oficiales.</p>
       </footer>
     </div>
   );

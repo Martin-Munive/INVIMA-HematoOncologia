@@ -64,6 +64,23 @@ type DrugReport = {
 
 const API_BASE = 'http://127.0.0.1:8000';
 
+type RegulatoryIndicationSummary = {
+  label: string;
+  presentations: {
+    producto: string;
+    registro_sanitario: string;
+  }[];
+};
+
+const INDICATION_PATTERNS: { label: string; pattern: RegExp }[] = [
+  { label: 'Cancer de mama metastasico', pattern: /CANCER DE MAMA METASTASICO/i },
+  { label: 'Cancer de mama', pattern: /CANCER DE MAMA(?! METASTASICO)|CARCINOMA DE MAMA|CARCINOMA AVANZADO DE SENO/i },
+  { label: 'Cancer de ovario', pattern: /CANCER DE OVARIO|CANCER METASTASICO DEL OVARIO|CARCINOMA AVANZADO DEL OVARIO|CARCINOMA METASTASICO DE OVARIO/i },
+  { label: 'Cancer de pulmon no microcitico / NSCLC', pattern: /CANCER DE PULMON NO MICROCITICO|CANCER DE PULMON DE CELULAS NO[- ]PEQUENAS|NSCLC/i },
+  { label: 'Adenocarcinoma de pancreas metastasico', pattern: /ADENOCARCINOMA DE PANCREAS METASTASICO/i },
+  { label: 'Sarcoma de Kaposi relacionado con SIDA', pattern: /SARCOMA DE KAPOSI/i },
+];
+
 function statusClass(ok: boolean) {
   return ok ? 'status-ok' : 'status-warn';
 }
@@ -73,6 +90,34 @@ function splitBullets(text: string) {
     .split(/\n+/)
     .map((line) => line.trim())
     .filter(Boolean);
+}
+
+function normalizeSearchText(text: string) {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+}
+
+function buildRegulatorySummary(details: InvimaDetail[]) {
+  const grouped = new Map<string, RegulatoryIndicationSummary>();
+
+  details.forEach((detail) => {
+    const indicationText = normalizeSearchText(detail.indicaciones || '');
+    INDICATION_PATTERNS.forEach(({ label, pattern }) => {
+      if (!pattern.test(indicationText)) return;
+      const current = grouped.get(label) ?? { label, presentations: [] };
+      const alreadyListed = current.presentations.some(
+        (presentation) => presentation.registro_sanitario === detail.registro_sanitario && presentation.producto === detail.producto,
+      );
+      if (!alreadyListed) {
+        current.presentations.push({
+          producto: detail.producto,
+          registro_sanitario: detail.registro_sanitario,
+        });
+      }
+      grouped.set(label, current);
+    });
+  });
+
+  return Array.from(grouped.values()).sort((a, b) => b.presentations.length - a.presentations.length || a.label.localeCompare(b.label));
 }
 
 function Panel({ title, icon, children, className = '' }: { title: string; icon: React.ReactNode; children: React.ReactNode; className?: string }) {
@@ -122,6 +167,7 @@ function App() {
   const financed = Boolean(report?.pospopuli.items.some((item) => item.financiacion));
   const complete = Boolean(report?.completion.is_complete_for_current_sources);
   const firstDetail = report?.invima.details[0];
+  const regulatorySummary = report ? buildRegulatorySummary(report.invima.details) : [];
 
   return (
     <div className="app-shell">
@@ -181,6 +227,30 @@ function App() {
                     <span key={item.estado} className="count-chip">{item.estado}: {item.n}</span>
                   ))}
                 </div>
+                <div className="subsection-title">Patologias detectadas en indicaciones INVIMA vigentes</div>
+                {regulatorySummary.length ? (
+                  <div className="regulatory-summary">
+                    {regulatorySummary.map((item) => (
+                      <article key={item.label} className="indication-summary-card">
+                        <div className="indication-summary-head">
+                          <strong>{item.label}</strong>
+                          <span>{item.presentations.length} presentaciones</span>
+                        </div>
+                        <div className="presentation-tags">
+                          {item.presentations.slice(0, 5).map((presentation) => (
+                            <span key={`${item.label}-${presentation.producto}-${presentation.registro_sanitario}`}>
+                              {presentation.producto} - {presentation.registro_sanitario}
+                            </span>
+                          ))}
+                          {item.presentations.length > 5 && <span>+{item.presentations.length - 5} mas</span>}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState text="No se detectaron patologias en el texto local de indicaciones INVIMA." />
+                )}
+                <div className="source-note">Fuente: derivado del campo de indicaciones INVIMA por presentacion. Confirmar el texto completo en el panel inferior antes de autorizar uso.</div>
                 {report.completion.missing_sources.length > 0 && (
                   <div className="warning-box">Faltan fuentes: {report.completion.missing_sources.join(', ')}</div>
                 )}

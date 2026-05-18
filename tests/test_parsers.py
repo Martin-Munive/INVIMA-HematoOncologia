@@ -71,6 +71,30 @@ class ParserTests(unittest.TestCase):
         self.assertIn("Exfoliante", rows[0].extravasacion)
         self.assertIn("Cancer de ovario", rows[0].indicacion_manual)
 
+    def test_manual_parser_uses_blank_groups_when_headers_are_missing(self):
+        text = """
+        ACETATO DE GOSERELINA
+        * Analogo de hormona liberadora de gonadotropina.
+        * Suprime gonadotropinas.
+
+        * Sofocos.
+        * Fatiga.
+
+        CLASIFICACION:
+        * No vesicante.
+        MANEJO:
+        * Retirar la aguja.
+
+        ZOLADEX® 3.6 MG
+        * Cancer de mama.
+        """
+        rows = parse_manual_text(text, targets=["ACETATO DE GOSERELINA"])
+        self.assertEqual(len(rows), 1)
+        self.assertIn("Analogo", rows[0].mecanismo)
+        self.assertIn("Sofocos", rows[0].efectos_adversos)
+        self.assertIn("No vesicante", rows[0].extravasacion)
+        self.assertIn("Cancer de mama", rows[0].indicacion_manual)
+
 
 if __name__ == "__main__":
     unittest.main()

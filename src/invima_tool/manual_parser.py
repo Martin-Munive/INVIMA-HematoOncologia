@@ -81,7 +81,19 @@ def parse_manual_text(text: str, targets: list[str] | None = None) -> list[Manua
         elif pos + 1 < len(headings):
             end = headings[pos + 1][0]
 
-        block_lines = [clean_ws(line) for line in lines[start + 1 : end] if clean_ws(line)]
+        raw_block = lines[start + 1 : end]
+        block_lines = [clean_ws(line) for line in raw_block if clean_ws(line)]
+        grouped_lines: list[list[str]] = []
+        for raw_line in raw_block:
+            cleaned = clean_ws(raw_line)
+            if not cleaned:
+                if grouped_lines and grouped_lines[-1]:
+                    grouped_lines.append([])
+                continue
+            if not grouped_lines:
+                grouped_lines.append([])
+            grouped_lines[-1].append(cleaned)
+        grouped_lines = [group for group in grouped_lines if group]
         mechanism: list[str] = []
         adverse: list[str] = []
         extravasation: list[str] = []
@@ -129,6 +141,29 @@ def parse_manual_text(text: str, targets: list[str] | None = None) -> list[Manua
                     adverse = before_indication[:extravasation_start]
                     extravasation = before_indication[extravasation_start:]
                     mechanism = []
+                    groups_before_indication: list[list[str]] = []
+                    current_index = 0
+                    for group in grouped_lines:
+                        next_index = current_index + len(group)
+                        if current_index >= indication_start:
+                            break
+                        groups_before_indication.append(group[: max(0, min(len(group), indication_start - current_index))])
+                        current_index = next_index
+                    groups_before_indication = [group for group in groups_before_indication if group]
+                    extravasation_group_index = None
+                    consumed = 0
+                    for group_index, group in enumerate(groups_before_indication):
+                        if consumed <= extravasation_start < consumed + len(group):
+                            extravasation_group_index = group_index
+                            break
+                        consumed += len(group)
+                    if extravasation_group_index is not None and extravasation_group_index >= 2:
+                        mechanism = groups_before_indication[0]
+                        adverse = [
+                            item
+                            for group in groups_before_indication[1:extravasation_group_index]
+                            for item in group
+                        ]
                 else:
                     adverse = before_indication
                     mechanism = []

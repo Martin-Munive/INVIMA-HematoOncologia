@@ -18,6 +18,12 @@ PACLITAXEL is the reference workflow for adding the next hemato-oncology medicat
 
 The processing queue must avoid duplicates.
 
+The durable queue lives in:
+
+```text
+docs/MEDICATION_QUEUE.md
+```
+
 Recommended order:
 
 1. Extract medication names from the manual oncology document.
@@ -31,6 +37,8 @@ Recommended order:
 5. Add only UNIRS medications not already processed or queued from the manual document.
 
 This avoids processing `PACLITAXEL`, `NAB-PACLITAXEL`, branded products or concentration variants as separate primary workflows unless they require distinct regulatory handling.
+
+After PACLITAXEL, the first started medication is `ACETATO DE GOSERELINA / GOSERELINA`. It currently has manual and UNIRS evidence, but still requires INVIMA, POS Populi and scientific safety curation before it can be considered complete.
 
 ## PACLITAXEL steps
 

@@ -8,10 +8,14 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from invima_tool.cli import DB_PATH
-from invima_tool.reporting import build_drug_report
+from invima_tool.reporting import _query_terms, build_drug_report
 
 
 class ReportingTests(unittest.TestCase):
+    def test_query_terms_strip_common_salt_prefixes(self):
+        self.assertEqual(_query_terms("ACETATO DE GOSERELINA"), ["ACETATO DE GOSERELINA", "GOSERELINA"])
+        self.assertEqual(_query_terms("ACIDO ZOLEDRONICO"), ["ACIDO ZOLEDRONICO", "ZOLEDRONICO"])
+
     def test_paclitaxel_report_shape_when_local_db_exists(self):
         if not DB_PATH.exists():
             raise unittest.SkipTest("Base SQLite local no incluida en el repositorio publico")

@@ -12,24 +12,58 @@ def _first_row(con: sqlite3.Connection, sql: str, params=()):
     return dict(row) if row else None
 
 
+def _query_terms(query: str) -> list[str]:
+    cleaned = " ".join(query.strip().split())
+    terms = [cleaned]
+    upper = cleaned.upper()
+    prefixes = (
+        "ACETATO DE ",
+        "ACIDO ",
+        "ÁCIDO ",
+        "CLORHIDRATO DE ",
+        "FOSFATO DE ",
+        "SULFATO DE ",
+    )
+    for prefix in prefixes:
+        if upper.startswith(prefix):
+            terms.append(cleaned[len(prefix) :].strip())
+    seen = set()
+    unique = []
+    for term in terms:
+        key = term.upper()
+        if term and key not in seen:
+            unique.append(term)
+            seen.add(key)
+    return unique
+
+
+def _like_any(row: sqlite3.Row | dict, fields: tuple[str, ...], terms: list[str]) -> bool:
+    values = [str(row[field] or "").upper() for field in fields]
+    return any(term.upper() in value for term in terms for value in values)
+
+
 def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = False) -> dict:
+    terms = _query_terms(query)
     con = connect(db_path)
     try:
         init_db(con)
-        term = f"%{query}%"
 
         registration_counts = [
             dict(row)
             for row in con.execute(
                 """
-                SELECT estado, count(*) AS n
+                SELECT estado, principio_activo, producto
                 FROM invima_registrations
-                WHERE upper(principio_activo) LIKE upper(?) OR upper(producto) LIKE upper(?)
-                GROUP BY estado
-                ORDER BY CASE WHEN estado = 'Vigente' THEN 0 ELSE 1 END, n DESC
                 """,
-                (term, term),
             )
+            if _like_any(row, ("principio_activo", "producto"), terms)
+        ]
+        counts_by_status: dict[str, int] = {}
+        for row in registration_counts:
+            counts_by_status[row["estado"]] = counts_by_status.get(row["estado"], 0) + 1
+        registration_counts = [
+            {"estado": estado, "n": n}
+            for estado, n in sorted(counts_by_status.items(), key=lambda item: (0 if item[0] == "Vigente" else 1, -item[1]))
         ]
         details = [
             dict(row)
@@ -38,11 +72,10 @@ def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = F
                 SELECT expediente, cdgprod, producto, registro_sanitario, estado,
                        forma_farmaceutica, principio_activo, concentracion, atc, indicaciones
                 FROM invima_details
-                WHERE upper(producto) LIKE upper(?) OR upper(principio_activo) LIKE upper(?)
                 ORDER BY producto, expediente
-                """,
-                (term, term),
+                """
             )
+            if _like_any(row, ("producto", "principio_activo"), terms)
         ]
         if only_vigente:
             details = [row for row in details if row["estado"] == "Vigente"]
@@ -54,11 +87,10 @@ def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = F
                 SELECT principio_activo, dci_concentracion, forma_farmaceutica,
                        indicaciones, tipo_indicacion, indicacion_habilitada
                 FROM unirs_indications
-                WHERE upper(principio_activo) LIKE upper(?)
                 ORDER BY principio_activo, forma_farmaceutica
-                """,
-                (term,),
+                """
             )
+            if _like_any(row, ("principio_activo", "dci_concentracion"), terms)
         ]
         pos = [
             dict(row)
@@ -66,23 +98,23 @@ def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = F
                 """
                 SELECT nombre, tipo, codigo_atc, descripcion, detalle_url, financiacion
                 FROM pospopuli_results
-                WHERE upper(nombre) LIKE upper(?)
                 ORDER BY nombre
-                """,
-                (term,),
+                """
             )
+            if _like_any(row, ("nombre",), terms)
         ]
-        manual = _first_row(
-            con,
-            """
-            SELECT nombre, mecanismo, efectos_adversos, extravasacion, indicacion_manual
-            FROM manual_drug_profiles
-            WHERE upper(nombre) LIKE upper(?)
-            ORDER BY nombre
-            LIMIT 1
-            """,
-            (term,),
-        )
+        manual_rows = [
+            row
+            for row in con.execute(
+                """
+                SELECT nombre, mecanismo, efectos_adversos, extravasacion, indicacion_manual
+                FROM manual_drug_profiles
+                ORDER BY nombre
+                """
+            )
+            if _like_any(row, ("nombre",), terms)
+        ]
+        manual = dict(manual_rows[0]) if manual_rows else None
     finally:
         con.close()
 

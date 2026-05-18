@@ -69,6 +69,8 @@ type RegulatoryIndicationSummary = {
   presentations: {
     producto: string;
     registro_sanitario: string;
+    concentracion: string;
+    forma_farmaceutica: string;
   }[];
 };
 
@@ -111,6 +113,8 @@ function buildRegulatorySummary(details: InvimaDetail[]) {
         current.presentations.push({
           producto: detail.producto,
           registro_sanitario: detail.registro_sanitario,
+          concentracion: detail.concentracion,
+          forma_farmaceutica: detail.forma_farmaceutica,
         });
       }
       grouped.set(label, current);
@@ -231,24 +235,47 @@ function App() {
                 {regulatorySummary.length ? (
                   <div className="regulatory-summary">
                     {regulatorySummary.map((item) => (
-                      <article key={item.label} className="indication-summary-card">
+                      <article key={item.label} className="indication-summary-section">
                         <div className="indication-summary-head">
                           <strong>{item.label}</strong>
                           <span>{item.presentations.length} presentaciones</span>
                         </div>
-                        <div className="presentation-tags">
-                          {item.presentations.slice(0, 5).map((presentation) => (
-                            <span key={`${item.label}-${presentation.producto}-${presentation.registro_sanitario}`}>
-                              {presentation.producto} - {presentation.registro_sanitario}
-                            </span>
+                        <div className="presentation-list">
+                          <div className="presentation-list-head">
+                            <span>Producto</span>
+                            <span>Concentracion</span>
+                            <span>Registro</span>
+                          </div>
+                          {item.presentations.map((presentation) => (
+                            <div className="presentation-line" key={`${item.label}-${presentation.producto}-${presentation.registro_sanitario}`}>
+                              <span>{presentation.producto}</span>
+                              <span>{presentation.concentracion || presentation.forma_farmaceutica || 'Sin dato'}</span>
+                              <span>{presentation.registro_sanitario}</span>
+                            </div>
                           ))}
-                          {item.presentations.length > 5 && <span>+{item.presentations.length - 5} mas</span>}
                         </div>
                       </article>
                     ))}
                   </div>
                 ) : (
                   <EmptyState text="No se detectaron patologias en el texto local de indicaciones INVIMA." />
+                )}
+                <div className="subsection-title">UNIRS en el mismo informe</div>
+                {report.unirs.items.length ? (
+                  <div className="unirs-summary-list">
+                    {report.unirs.items.map((item, index) => (
+                      <div className="unirs-summary-line" key={`${item.dci_concentracion}-${index}`}>
+                        <div>
+                          <strong>{item.dci_concentracion}</strong>
+                          <span>{item.forma_farmaceutica || 'Forma farmaceutica no reportada'}</span>
+                        </div>
+                        <p>{item.indicaciones}</p>
+                        <span>{item.tipo_indicacion || 'Sin clasificacion'}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState text="No hay indicaciones UNIRS locales para este medicamento." />
                 )}
                 <div className="source-note">Fuente: derivado del campo de indicaciones INVIMA por presentacion. Confirmar el texto completo en el panel inferior antes de autorizar uso.</div>
                 {report.completion.missing_sources.length > 0 && (
@@ -321,6 +348,9 @@ function App() {
           </>
         )}
       </main>
+      <footer className="legal-footer">
+        INVIMA Hemato-Oncologia es una aplicacion independiente. Integra fuentes publicas y locales para apoyo informativo; no reemplaza la consulta de la fuente oficial, el criterio clinico ni los procesos regulatorios aplicables. INVIMA, UNIRS y POS Populi conservan la titularidad y autoridad sobre sus datos oficiales.
+      </footer>
     </div>
   );
 }

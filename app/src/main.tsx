@@ -371,20 +371,24 @@ function App() {
                 )}
               </Panel>
 
-              <Panel title="Perfil manual oncologico" icon={<Activity size={16} />}>
-                {report.manual_profile ? (
-                  <div className="text-list">
-                    <h3>{report.manual_profile.nombre}</h3>
-                    {splitBullets(report.manual_profile.efectos_adversos).slice(0, 8).map((line) => <p key={line}>{line}</p>)}
-                    <div className="subsection-title">Extravasacion / manejo</div>
-                    {splitBullets(report.manual_profile.extravasacion).map((line) => <p key={line}>{line}</p>)}
-                  </div>
-                ) : <EmptyState text="Sin perfil manual cargado." />}
-              </Panel>
-
-              <Panel title="Seguridad clinica curada" icon={<AlertTriangle size={16} />} className="span-2">
-                {report.clinical_safety ? (
+              <Panel title="Perfil clinico y seguridad" icon={<AlertTriangle size={16} />} className="span-2">
+                {report.clinical_safety || report.manual_profile ? (
                   <div className="safety-layout">
+                    {report.manual_profile && (
+                      <div className="safety-column clinical-baseline">
+                        <div className="subsection-title">Perfil local</div>
+                        <h3>{report.manual_profile.nombre}</h3>
+                        {report.manual_profile.mecanismo && <p>{report.manual_profile.mecanismo}</p>}
+                        {report.manual_profile.indicacion_manual && (
+                          <details className="safety-group">
+                            <summary><ChevronDown size={15} aria-hidden="true" /> <span>Indicaciones resumidas locales</span><small>Abrir</small></summary>
+                            {splitBullets(report.manual_profile.indicacion_manual).map((line) => <p key={line}>{line}</p>)}
+                          </details>
+                        )}
+                      </div>
+                    )}
+                    {report.clinical_safety && (
+                      <>
                     <div className="safety-column">
                       <div className="subsection-title">Reacciones adversas por sistema</div>
                       {report.clinical_safety.adverse_reactions_by_system.map((group) => (
@@ -409,8 +413,13 @@ function App() {
                       </ul>
                     </div>
                     <div className="source-note">Fuentes curadas: {report.clinical_safety.sources.map((source) => source.label).join('; ')}.</div>
+                      </>
+                    )}
+                    {!report.clinical_safety && report.manual_profile && (
+                      <div className="source-note">Este medicamento solo tiene perfil manual local. Falta inmersion cientifica curada para seguridad por sistema, hipersensibilidad y extravasacion.</div>
+                    )}
                   </div>
-                ) : <EmptyState text="Sin inmersion cientifica curada para este medicamento." />}
+                ) : <EmptyState text="Sin perfil clinico local ni inmersion cientifica curada para este medicamento." />}
               </Panel>
 
               <Panel title="Indicaciones INVIMA por presentacion" icon={<ShieldCheck size={16} />} className="span-2 tall">

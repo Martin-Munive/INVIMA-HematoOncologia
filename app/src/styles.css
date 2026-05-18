@@ -36,7 +36,7 @@ input {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 12px 18px;
+  padding: 12px clamp(12px, 3vw, 18px);
   border-bottom: 1px solid rgba(0, 229, 255, 0.28);
   background: rgba(2, 6, 23, 0.96);
 }
@@ -76,7 +76,7 @@ input {
 .workspace {
   width: min(1540px, 100%);
   margin: 0 auto;
-  padding: 18px;
+  padding: clamp(10px, 3vw, 18px);
 }
 
 .search-band {
@@ -179,7 +179,7 @@ input {
 
 .content-grid {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
 }
 
@@ -276,11 +276,12 @@ input {
 
 .indication-summary-head small {
   border: 1px solid rgba(0, 229, 255, 0.26);
+  box-shadow: 0 0 0 rgba(0, 255, 136, 0);
   border-radius: 999px;
   color: #cbd5e1;
   font-size: 0.7rem;
   padding: 2px 8px;
-  animation: openCue 1.9s ease-in-out infinite;
+  animation: openCue 1s steps(2, end) infinite;
 }
 
 .indication-summary-head svg,
@@ -516,6 +517,17 @@ input {
   gap: 16px;
 }
 
+.clinical-baseline {
+  border-right: 1px solid rgba(148, 163, 184, 0.16);
+  padding-right: 16px;
+}
+
+.clinical-baseline h3 {
+  margin: 4px 0 8px;
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
 .safety-column p,
 .safety-column li {
   color: #cbd5e1;
@@ -550,12 +562,13 @@ input {
 
 .safety-group summary small {
   border: 1px solid rgba(0, 229, 255, 0.26);
+  box-shadow: 0 0 0 rgba(0, 255, 136, 0);
   border-radius: 999px;
   color: #cbd5e1;
   font-size: 0.7rem;
   font-weight: 500;
   padding: 2px 8px;
-  animation: openCue 1.9s ease-in-out infinite;
+  animation: openCue 1s steps(2, end) infinite;
 }
 
 .indication-summary-section[open] > .indication-summary-head small,
@@ -570,12 +583,14 @@ input {
     color: #cbd5e1;
     border-color: rgba(0, 229, 255, 0.26);
     background: rgba(2, 6, 23, 0.35);
+    box-shadow: 0 0 0 rgba(0, 255, 136, 0);
   }
 
   50% {
     color: #020617;
-    border-color: rgba(0, 255, 136, 0.72);
-    background: rgba(0, 255, 136, 0.82);
+    border-color: rgba(0, 255, 136, 0.95);
+    background: rgba(0, 255, 136, 0.95);
+    box-shadow: 0 0 14px rgba(0, 255, 136, 0.62);
   }
 }
 
@@ -645,5 +660,89 @@ input {
 
   .legal-footer {
     padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar,
+  .brand {
+    gap: 10px;
+  }
+
+  .brand svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .brand-title {
+    font-size: 0.95rem;
+  }
+
+  .brand-subtitle,
+  .system-strip {
+    font-size: 0.7rem;
+  }
+
+  .search-box {
+    grid-template-columns: auto 1fr;
+  }
+
+  .search-box button {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 42px;
+  }
+
+  .summary-grid {
+    gap: 8px;
+  }
+
+  .metric {
+    min-height: 74px;
+    padding: 10px;
+  }
+
+  .hud-panel {
+    border-radius: 7px;
+  }
+
+  .panel-title {
+    min-height: 34px;
+    font-size: 0.78rem;
+  }
+
+  .panel-body {
+    padding: 10px;
+  }
+
+  .count-chip {
+    width: 100%;
+  }
+
+  .indication-summary-head,
+  .safety-group summary {
+    min-height: 44px;
+  }
+
+  .presentation-list,
+  .unirs-compact-list {
+    border-radius: 7px;
+  }
+
+  .presentation-line,
+  .unirs-compact-line {
+    padding: 9px;
+    font-size: 0.82rem;
+  }
+
+  .clinical-baseline {
+    border-right: none;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+    padding-right: 0;
+    padding-bottom: 10px;
+  }
+
+  .legal-footer {
+    font-size: 0.72rem;
   }
 }

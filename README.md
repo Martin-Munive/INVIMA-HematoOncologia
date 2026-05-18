@@ -243,6 +243,7 @@ Documentos relacionados:
 
 - `docs/COMMERCIAL_LEGAL_NOTES.md`
 - `docs/UI_CLINICAL_PRESENTATION_NOTES.md`
+- `docs/PACLITAXEL_WORKFLOW.md`
 
 ## Datos locales y privacidad
 
@@ -300,13 +301,11 @@ Componentes principales:
 
 ## Roadmap
 
-1. Crear API local con FastAPI.
-2. Exponer `GET /api/drugs/{query}/report`.
-3. Crear interfaz React/Vite con estilo visual tipo ER-IA.
-4. Mostrar ficha por medicamento con secciones de INVIMA, UNIRS, UPC, perfil manual y fuentes.
-5. Agregar trazabilidad detallada de fuente, fecha y tipo de evidencia.
-6. Integrar manejo tecnico y toxicidad desde literatura cientifica con citas separadas.
-7. Procesar medicamentos adicionales de forma incremental.
+1. Procesar los medicamentos del documento manual usando `docs/PACLITAXEL_WORKFLOW.md`.
+2. Procesar medicamentos UNIRS no repetidos despues de terminar la cola manual.
+3. Agregar trazabilidad detallada de fuente, fecha y tipo de evidencia.
+4. Integrar importadores visuales para INVIMA, manual y fuentes complementarias.
+5. Convertir cada inmersion cientifica validada en perfil clinico curado por medicamento.
 
 ## Autor
 

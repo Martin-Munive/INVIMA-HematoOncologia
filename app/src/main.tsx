@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Activity, AlertTriangle, BadgeCheck, Database, FileSearch, FlaskConical, Search, ShieldCheck } from 'lucide-react';
+import { Activity, AlertTriangle, BadgeCheck, ChevronDown, Database, FileSearch, FlaskConical, Search, ShieldCheck } from 'lucide-react';
 import './styles.css';
 
 type Completion = {
@@ -314,8 +314,10 @@ function App() {
                     {regulatorySummary.map((item, index) => (
                       <details key={item.label} className="indication-summary-section" open={index < 2}>
                         <summary className="indication-summary-head">
+                          <ChevronDown size={16} aria-hidden="true" />
                           <strong>{item.label}</strong>
                           <span>{item.presentations.length} presentaciones</span>
+                          <small>Abrir</small>
                         </summary>
                         <div className="presentation-list">
                           <div className="presentation-list-head">
@@ -343,8 +345,10 @@ function App() {
                     {unirsSummary.map((item, index) => (
                       <details className="unirs-summary-section" key={item.label} open={index < 2}>
                         <summary className="indication-summary-head">
+                          <ChevronDown size={16} aria-hidden="true" />
                           <strong>{item.label}</strong>
                           <span>{item.items.length} registros UNIRS</span>
+                          <small>Abrir</small>
                         </summary>
                         <div className="unirs-compact-list">
                           {item.items.map((entry) => (
@@ -385,7 +389,7 @@ function App() {
                       <div className="subsection-title">Reacciones adversas por sistema</div>
                       {report.clinical_safety.adverse_reactions_by_system.map((group) => (
                         <details className="safety-group" key={group.system}>
-                          <summary>{group.system}</summary>
+                          <summary><ChevronDown size={15} aria-hidden="true" /> <span>{group.system}</span><small>Abrir</small></summary>
                           <ul>
                             {group.items.map((item) => <li key={item}>{item}</li>)}
                           </ul>

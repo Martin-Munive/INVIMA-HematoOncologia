@@ -3,6 +3,36 @@ import { createRoot } from 'react-dom/client';
 import { Activity, AlertTriangle, BadgeCheck, ChevronDown, Database, FileSearch, FlaskConical, Search, ShieldCheck } from 'lucide-react';
 import './styles.css';
 
+type ErrorBoundaryState = {
+  hasError: boolean;
+  message: string;
+};
+
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, ErrorBoundaryState> {
+  state: ErrorBoundaryState = { hasError: false, message: '' };
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, message: error.message };
+  }
+
+  render() {
+    if (!this.state.hasError) return this.props.children;
+    return (
+      <div className="app-shell">
+        <main className="workspace">
+          <section className="fallback-panel">
+            <AlertTriangle size={22} />
+            <div>
+              <strong>No se pudo renderizar la ficha</strong>
+              <p>Recarga la pagina o vuelve a consultar el medicamento. Detalle tecnico: {this.state.message || 'error no especificado'}.</p>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
+  }
+}
+
 type Completion = {
   is_complete_for_current_sources: boolean;
   missing_sources: string[];
@@ -261,6 +291,32 @@ function EmptyState({ text }: { text: string }) {
   return <div className="empty-state">{text}</div>;
 }
 
+function normalizeReport(raw: DrugReport): DrugReport {
+  return {
+    ...raw,
+    completion: {
+      is_complete_for_current_sources: raw.completion?.is_complete_for_current_sources ?? false,
+      missing_sources: raw.completion?.missing_sources ?? [],
+    },
+    invima: {
+      registration_counts: raw.invima?.registration_counts ?? [],
+      details_count: raw.invima?.details_count ?? 0,
+      details: raw.invima?.details ?? [],
+      open_cum_count: raw.invima?.open_cum_count ?? 0,
+      open_cum: raw.invima?.open_cum ?? [],
+    },
+    unirs: {
+      count: raw.unirs?.count ?? 0,
+      items: raw.unirs?.items ?? [],
+    },
+    pospopuli: {
+      count: raw.pospopuli?.count ?? 0,
+      items: raw.pospopuli?.items ?? [],
+    },
+    source_policy: raw.source_policy ?? {},
+  };
+}
+
 function App() {
   const [query, setQuery] = React.useState('PACLITAXEL');
   const [report, setReport] = React.useState<DrugReport | null>(null);
@@ -277,7 +333,8 @@ function App() {
       if (!response.ok) {
         throw new Error(`API ${response.status}`);
       }
-      setReport(await response.json());
+      const payload = await response.json();
+      setReport(normalizeReport(payload));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo consultar la API local');
     } finally {
@@ -321,6 +378,26 @@ function App() {
           </div>
           {error && <div className="error-line"><AlertTriangle size={16} /> {error}</div>}
         </section>
+
+        {loading && !report && (
+          <section className="fallback-panel">
+            <Database size={22} />
+            <div>
+              <strong>Consultando base local</strong>
+              <p>La API esta construyendo el reporte consolidado del medicamento.</p>
+            </div>
+          </section>
+        )}
+
+        {!loading && !report && (
+          <section className="fallback-panel">
+            <FileSearch size={22} />
+            <div>
+              <strong>Busca un medicamento</strong>
+              <p>Escribe un principio activo para consultar registros, presentaciones, fuentes y perfil clinico disponible.</p>
+            </div>
+          </section>
+        )}
 
         {report && (
           <>
@@ -570,4 +647,8 @@ function App() {
   );
 }
 
-createRoot(document.getElementById('root')!).render(<App />);
+createRoot(document.getElementById('root')!).render(
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>,
+);

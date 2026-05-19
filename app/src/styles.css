@@ -132,6 +132,34 @@ input {
   font-weight: 700;
 }
 
+.fallback-panel {
+  min-height: 132px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid rgba(0, 229, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #cbd5e1;
+}
+
+.fallback-panel svg {
+  color: #00e5ff;
+  flex: 0 0 auto;
+}
+
+.fallback-panel strong {
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
+.fallback-panel p {
+  margin: 5px 0 0;
+  color: #94a3b8;
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

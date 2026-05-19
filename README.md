@@ -280,6 +280,14 @@ Ejecutar:
 
 Algunas pruebas usan fixtures locales no incluidos en el repositorio publico. Si esos archivos no existen, se omiten de forma controlada.
 
+Verificacion rapida con API y frontend ya iniciados:
+
+```powershell
+.\.INVIMA\Scripts\python.exe scripts\smoke_check.py --drug PACLITAXEL
+```
+
+Esta comprobacion valida que la API responda, que el contrato del reporte incluya los campos esperados por la interfaz y que el frontend local devuelva HTTP 200.
+
 ## Arquitectura actual
 
 ```text

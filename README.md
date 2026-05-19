@@ -61,11 +61,12 @@ Implementado:
 - parser de UNIRS desde XLSX;
 - parser de POS Populi desde HTML guardado;
 - parser de documento manual oncologico;
-- importador de CUM vigentes desde Datos Abiertos Colombia para registros y presentaciones;
 - base local SQLite;
 - comandos de importacion, consulta y reporte;
+- comando de cobertura para detectar medicamentos pendientes de detalle INVIMA;
+- importacion por carpeta de resultados INVIMA guardados despues del CAPTCHA manual;
 - API local FastAPI;
-- frontend React/Vite con resumen regulatorio, presentaciones CUM, UNIRS integrado y seguridad clinica curada para PACLITAXEL;
+- frontend React/Vite con resumen regulatorio, UNIRS integrado y seguridad clinica curada para PACLITAXEL;
 - pruebas unitarias iniciales;
 - reporte consolidado funcional para `PACLITAXEL` en el entorno local de desarrollo.
 
@@ -199,19 +200,23 @@ Importar resultados INVIMA previamente guardados despues de resolver el CAPTCHA 
 .\.INVIMA\Scripts\python.exe run_cli.py import-invima-results "C:\ruta\resultado_invima.html" --only-vigente --fetch-details
 ```
 
+Importar todos los resultados INVIMA guardados en una carpeta:
+
+```powershell
+.\.INVIMA\Scripts\python.exe run_cli.py import-invima-results-dir "C:\ruta\resultados_invima" --pattern "*.html" --only-vigente --fetch-details
+```
+
+Revisar que medicamentos de la cola manual y UNIRS aun no tienen detalle INVIMA importado:
+
+```powershell
+.\.INVIMA\Scripts\python.exe run_cli.py coverage --limit 25
+```
+
 Completar detalles desde registros ya importados:
 
 ```powershell
 .\.INVIMA\Scripts\python.exe run_cli.py fetch-details-from-db PACLITAXEL --only-vigente
 ```
-
-Importar registros y presentaciones vigentes desde Datos Abiertos Colombia CUM:
-
-```powershell
-.\.INVIMA\Scripts\python.exe run_cli.py import-open-cum PACLITAXEL
-```
-
-Este comando ayuda a poblar rapidamente la base local para busquedas y pruebas visuales. La fuente CUM aporta registros, estados y presentaciones; no debe usarse como texto de indicacion INVIMA cuando el detalle regulatorio no este disponible.
 
 ## Fuentes de informacion
 
@@ -227,11 +232,7 @@ El formulario de busqueda principal puede usar CAPTCHA. Este proyecto no impleme
 4. importacion local;
 5. descarga de detalles cuando existen `expediente` y `cdgprod`.
 
-### Datos Abiertos Colombia CUM
-
-Fuente tecnica para registros y presentaciones vigentes publicadas como conjunto abierto. Se usa para poblar la base local con expediente, producto, registro sanitario, estado, forma farmaceutica, via, concentracion y titular cuando no se ha importado todavia el detalle HTML de INVIMA.
-
-Esta fuente no reemplaza el texto de indicacion INVIMA del detalle regulatorio. En la interfaz se muestra como presentaciones CUM y debe mantenerse separada de las indicaciones autorizadas.
+El identificador `cdgprod` debe venir del resultado INVIMA o de una exportacion tecnica equivalente. No debe inferirse desde otras fuentes.
 
 ### UNIRS
 

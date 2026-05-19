@@ -37,12 +37,14 @@ class ParserTests(unittest.TestCase):
         )
         self.assertEqual(detail.expediente, "20260945")
         self.assertIn("CÁNCER DE MAMA", detail.indicaciones)
+        self.assertEqual(detail.principio_activo, "PACLITAXEL")
+        self.assertEqual(detail.concentracion, "100,00000")
         self.assertEqual(detail.atc, "L01CD01")
 
     def test_unirs_fixture(self):
         rows = parse_unirs_xlsx(require_fixture(RAW / "UNIRS V24-07-2025.xlsx"))
         hits = filter_unirs(rows, "PACLITAXEL")
-        self.assertEqual(len(rows), 917)
+        self.assertEqual(len(rows), 915)
         self.assertEqual(len(hits), 8)
 
     def test_pospopuli_fixture(self):

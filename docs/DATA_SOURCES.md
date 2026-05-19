@@ -13,11 +13,10 @@ An indication is shown as an **INVIMA indication** only when it comes from an IN
 ## Source hierarchy
 
 1. **INVIMA detail pages**: primary source for indication text by product or presentation.
-2. **Datos Abiertos Colombia CUM**: source for sanitary registration, regulatory status and presentations when imported locally.
-3. **POS Populi**: source for UPC coverage or financing information.
-4. **UNIRS**: complementary source for enabled or referenced indications.
-5. **Local oncology profile**: curated local source for mechanism, adverse reactions, extravasation and summarized clinical notes.
-6. **Scientific literature and official drug monographs**: source for mechanism, toxicity, hypersensitivity, anaphylaxis and management when curated for a specific medication.
+2. **POS Populi**: source for UPC coverage or financing information.
+3. **UNIRS**: complementary source for enabled or referenced indications.
+4. **Local oncology profile**: curated local source for mechanism, adverse reactions, extravasation and summarized clinical notes.
+5. **Scientific literature and official drug monographs**: source for mechanism, toxicity, hypersensitivity, anaphylaxis and management when curated for a specific medication.
 
 ## INVIMA access limits
 
@@ -31,11 +30,7 @@ Allowed local workflow:
 4. structured storage in SQLite;
 5. source and limitation display in the report.
 
-## Datos Abiertos Colombia CUM
-
-The CUM open dataset is used as a structured local source for registration and presentation fields, including product name, registration number, status, dosage form, route, concentration and holder.
-
-This source is useful for populating the local database and testing the interface across many drugs. It is not treated as an indication-text source. A claim shown as an INVIMA indication still requires an INVIMA detail source or another explicit official source for that indication.
+For detail imports, the pair `expediente + cdgprod` must come from the INVIMA results page or a permitted export that preserves those values.
 
 ## Local data excluded from the repository
 

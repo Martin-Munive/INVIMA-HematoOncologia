@@ -16,10 +16,10 @@ class ReportingTests(unittest.TestCase):
         self.assertEqual(_query_terms("ACETATO DE GOSERELINA"), ["ACETATO DE GOSERELINA", "GOSERELINA"])
         self.assertEqual(_query_terms("ACIDO ZOLEDRONICO"), ["ACIDO ZOLEDRONICO", "ZOLEDRONICO"])
 
-    def test_report_shape_includes_open_cum_fields(self):
+    def test_report_shape_includes_invima_fields(self):
         report = build_drug_report(DB_PATH, "PACLITAXEL", only_vigente=True)
-        self.assertIn("open_cum_count", report["invima"])
-        self.assertIn("open_cum", report["invima"])
+        self.assertIn("details_count", report["invima"])
+        self.assertIn("details", report["invima"])
         self.assertIn("registration_source", report["source_policy"])
 
     def test_drug_suggestions_shape(self):

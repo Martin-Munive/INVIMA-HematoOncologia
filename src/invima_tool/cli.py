@@ -10,7 +10,6 @@ from pathlib import Path
 from .invima_client import fetch_invima_detail_by_expediente
 from .invima_parser import parse_invima_detail_html, parse_invima_results_html
 from .manual_parser import parse_manual_file
-from .open_data_client import fetch_cum_vigentes
 from .pospopuli_parser import parse_pospopuli_results_html
 from .storage import (
     connect,
@@ -20,7 +19,6 @@ from .storage import (
     upsert_manual_profiles,
     upsert_invima_detail,
     upsert_invima_registrations,
-    upsert_invima_open_cum,
 )
 from .reporting import build_drug_report
 from .text import normalize_key
@@ -76,15 +74,26 @@ def cmd_import_invima_results(args: argparse.Namespace) -> None:
     DATA_DIR.mkdir(exist_ok=True)
     con = connect(DB_PATH)
     init_db(con)
+    result = _import_invima_results_file(
+        con,
+        Path(args.html),
+        only_vigente=args.only_vigente,
+        fetch_details=args.fetch_details,
+        sleep=args.sleep,
+    )
+    con.close()
+    _print_json(result)
 
-    registrations = parse_invima_results_html(args.html)
-    if args.only_vigente:
+
+def _import_invima_results_file(con, html: Path, *, only_vigente: bool, fetch_details: bool, sleep: float) -> dict:
+    registrations = parse_invima_results_html(html)
+    if only_vigente:
         registrations = [row for row in registrations if row.estado == "Vigente"]
     upsert_invima_registrations(con, registrations)
 
     fetched = 0
     errors: list[dict[str, str]] = []
-    if args.fetch_details:
+    if fetch_details:
         for row in registrations:
             if not row.cdgprod:
                 errors.append(
@@ -99,7 +108,7 @@ def cmd_import_invima_results(args: argparse.Namespace) -> None:
                 detail = fetch_invima_detail_by_expediente(row.expediente, row.cdgprod)
                 upsert_invima_detail(con, detail)
                 fetched += 1
-                time.sleep(args.sleep)
+                time.sleep(sleep)
             except Exception as exc:
                 errors.append(
                     {
@@ -109,13 +118,41 @@ def cmd_import_invima_results(args: argparse.Namespace) -> None:
                         "error": str(exc),
                     }
                 )
+    return {
+        "html": str(html),
+        "registrations_imported": len(registrations),
+        "details_fetched": fetched,
+        "errors": errors,
+    }
 
+
+def cmd_import_invima_results_dir(args: argparse.Namespace) -> None:
+    DATA_DIR.mkdir(exist_ok=True)
+    con = connect(DB_PATH)
+    init_db(con)
+    try:
+        paths = sorted(Path(args.dir).rglob(args.pattern))
+        results = [
+            _import_invima_results_file(
+                con,
+                path,
+                only_vigente=args.only_vigente,
+                fetch_details=args.fetch_details,
+                sleep=args.sleep,
+            )
+            for path in paths
+        ]
+    finally:
+        con.close()
     _print_json(
         {
-            "html": str(args.html),
-            "registrations_imported": len(registrations),
-            "details_fetched": fetched,
-            "errors": errors,
+            "dir": str(args.dir),
+            "pattern": args.pattern,
+            "files": len(results),
+            "registrations_imported": sum(item["registrations_imported"] for item in results),
+            "details_fetched": sum(item["details_fetched"] for item in results),
+            "errors": [error for item in results for error in item["errors"]],
+            "results": results,
         }
     )
 
@@ -285,26 +322,48 @@ def cmd_import_manual(args: argparse.Namespace) -> None:
     )
 
 
-def cmd_import_open_cum(args: argparse.Namespace) -> None:
-    DATA_DIR.mkdir(exist_ok=True)
-    con = connect(DB_PATH)
-    init_db(con)
-    rows = fetch_cum_vigentes(args.query, limit=args.limit, timeout=args.timeout)
-    upsert_invima_open_cum(con, rows)
-    _print_json(
-        {
-            "query": args.query,
-            "source": "datos.gov.co:i7cb-raxc",
-            "cum_rows_imported": len(rows),
-            "unique_expedientes": len({row.expediente for row in rows if row.expediente}),
-            "products": sorted({row.producto for row in rows if row.producto})[:20],
-            "note": "CUM open data contains registrations/presentations. INVIMA indication text still requires detail source when not present in CUM.",
-        }
-    )
-
-
 def cmd_report(args: argparse.Namespace) -> None:
     _print_json(build_drug_report(DB_PATH, args.query, only_vigente=args.only_vigente))
+
+
+def cmd_coverage(args: argparse.Namespace) -> None:
+    con = connect(DB_PATH)
+    init_db(con)
+    try:
+        manual = {row["nombre"] for row in con.execute("SELECT nombre FROM manual_drug_profiles")}
+        unirs = {
+            row["principio_activo"]
+            for row in con.execute(
+                """
+                SELECT DISTINCT principio_activo FROM unirs_indications
+                WHERE principio_activo != '' AND indicaciones != ''
+                """
+            )
+        }
+        universe = sorted(manual | unirs)
+        rows = []
+        for name in universe:
+            like = f"%{name}%"
+            details = con.execute(
+                """
+                SELECT COUNT(*) FROM invima_details
+                WHERE upper(principio_activo) LIKE upper(?) OR upper(producto) LIKE upper(?)
+                """,
+                (like, like),
+            ).fetchone()[0]
+            rows.append({"drug": name, "has_invima_details": details > 0, "invima_details": details})
+    finally:
+        con.close()
+
+    missing = [row for row in rows if not row["has_invima_details"]]
+    _print_json(
+        {
+            "total": len(rows),
+            "with_invima_details": len(rows) - len(missing),
+            "missing_invima_details": len(missing),
+            "missing": missing[: args.limit] if args.limit else missing,
+        }
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -320,6 +379,14 @@ def build_parser() -> argparse.ArgumentParser:
     import_results.add_argument("--fetch-details", action="store_true")
     import_results.add_argument("--sleep", type=float, default=0.3)
     import_results.set_defaults(func=cmd_import_invima_results)
+
+    import_results_dir = sub.add_parser("import-invima-results-dir")
+    import_results_dir.add_argument("dir")
+    import_results_dir.add_argument("--pattern", default="*.html")
+    import_results_dir.add_argument("--only-vigente", action="store_true")
+    import_results_dir.add_argument("--fetch-details", action="store_true")
+    import_results_dir.add_argument("--sleep", type=float, default=0.3)
+    import_results_dir.set_defaults(func=cmd_import_invima_results_dir)
 
     demo = sub.add_parser("paclitaxel-demo")
     demo.set_defaults(func=cmd_paclitaxel_demo)
@@ -350,16 +417,14 @@ def build_parser() -> argparse.ArgumentParser:
     manual.add_argument("--query", default="")
     manual.set_defaults(func=cmd_import_manual)
 
-    open_cum = sub.add_parser("import-open-cum")
-    open_cum.add_argument("query")
-    open_cum.add_argument("--limit", type=int, default=5000)
-    open_cum.add_argument("--timeout", type=int, default=60)
-    open_cum.set_defaults(func=cmd_import_open_cum)
-
     report = sub.add_parser("report")
     report.add_argument("query")
     report.add_argument("--only-vigente", action="store_true")
     report.set_defaults(func=cmd_report)
+
+    coverage = sub.add_parser("coverage")
+    coverage.add_argument("--limit", type=int, default=0)
+    coverage.set_defaults(func=cmd_coverage)
     return parser
 
 

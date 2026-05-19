@@ -79,7 +79,7 @@ def parse_unirs_xlsx(path: str | Path) -> list[UnirsIndication]:
     for row_number, values in rows:
         if row_number <= header_row or len(values) < 4:
             continue
-        if not values[0].strip():
+        if not values[0].strip() or not values[3].strip():
             continue
         indications.append(
             UnirsIndication(

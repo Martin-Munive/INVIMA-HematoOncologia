@@ -59,40 +59,6 @@ type InvimaDetail = {
   indicaciones: string;
 };
 
-type InvimaOpenCum = {
-  expediente: string;
-  producto: string;
-  titular: string;
-  registro_sanitario: string;
-  fecha_expedicion: string;
-  fecha_vencimiento: string;
-  estado_registro: string;
-  expediente_cum: string;
-  consecutivo_cum: string;
-  cantidad_cum: string;
-  descripcion_comercial: string;
-  estado_cum: string;
-  fecha_activo: string;
-  fecha_inactivo: string;
-  muestra_medica: string;
-  unidad: string;
-  atc: string;
-  descripcion_atc: string;
-  via_administracion: string;
-  concentracion: string;
-  principio_activo: string;
-  unidad_medida: string;
-  cantidad: string;
-  unidad_referencia: string;
-  forma_farmaceutica: string;
-  nombre_rol: string;
-  tipo_rol: string;
-  modalidad: string;
-  ium: string;
-  source_dataset: string;
-  imported_at: string;
-};
-
 type UnirsItem = {
   principio_activo: string;
   dci_concentracion: string;
@@ -140,8 +106,6 @@ type DrugReport = {
     registration_counts: { estado: string; n: number }[];
     details_count: number;
     details: InvimaDetail[];
-    open_cum_count: number;
-    open_cum: InvimaOpenCum[];
   };
   unirs: { count: number; items: UnirsItem[] };
   pospopuli: { count: number; items: PosPopuliItem[] };
@@ -302,8 +266,6 @@ function normalizeReport(raw: DrugReport): DrugReport {
       registration_counts: raw.invima?.registration_counts ?? [],
       details_count: raw.invima?.details_count ?? 0,
       details: raw.invima?.details ?? [],
-      open_cum_count: raw.invima?.open_cum_count ?? 0,
-      open_cum: raw.invima?.open_cum ?? [],
     },
     unirs: {
       count: raw.unirs?.count ?? 0,
@@ -321,7 +283,6 @@ function selectedDrugName(report: DrugReport) {
   return (
     report.manual_profile?.nombre ||
     report.invima.details[0]?.principio_activo ||
-    report.invima.open_cum[0]?.principio_activo ||
     report.unirs.items[0]?.principio_activo ||
     report.query
   );
@@ -332,15 +293,12 @@ function localDrugDescription(report: DrugReport) {
     return `${report.clinical_safety.definition} ${report.clinical_safety.mechanism}`;
   }
   if (report.manual_profile?.mecanismo) return report.manual_profile.mecanismo;
-  const atcDescription = report.invima.open_cum.find((item) => item.descripcion_atc)?.descripcion_atc;
-  if (atcDescription) return `Clasificacion ATC registrada: ${atcDescription}.`;
   if (report.clinical_safety) return 'Perfil clinico curado disponible para seguridad, hipersensibilidad y manejo de extravasacion.';
-  return 'Ficha consolidada local con registros, presentaciones y fuentes disponibles para el medicamento seleccionado.';
+  return 'Ficha consolidada local con detalles INVIMA, UNIRS, POS Populi y perfil clinico disponible para el medicamento seleccionado.';
 }
 
 function DrugHeader({ report, financed }: { report: DrugReport; financed: boolean }) {
   const firstDetail = report.invima.details[0];
-  const firstCum = report.invima.open_cum[0];
   const title = selectedDrugName(report);
   const posNames = report.pospopuli.items.map((item) => item.nombre).join(', ');
   return (
@@ -358,13 +316,13 @@ function DrugHeader({ report, financed }: { report: DrugReport; financed: boolea
         </div>
         <div>
           <span>ATC</span>
-          <strong>{firstDetail?.atc || firstCum?.atc || 'Sin dato'}</strong>
-          <small>{firstCum?.descripcion_atc || firstDetail?.forma_farmaceutica || 'Fuente local'}</small>
+          <strong>{firstDetail?.atc || 'Sin dato'}</strong>
+          <small>{firstDetail?.forma_farmaceutica || 'Detalle INVIMA'}</small>
         </div>
         <div>
-          <span>Registros / CUM</span>
-          <strong>{report.invima.details_count} / {report.invima.open_cum_count}</strong>
-          <small>Detalle INVIMA / presentaciones CUM</small>
+          <span>Detalles INVIMA</span>
+          <strong>{report.invima.details_count}</strong>
+          <small>Presentaciones con texto regulatorio</small>
         </div>
         <div>
           <span>UNIRS</span>
@@ -574,7 +532,7 @@ function App() {
               <div className="metric">
                 <Database size={22} />
                 <span>INVIMA local</span>
-                <strong>{report.invima.details_count || report.invima.open_cum_count}</strong>
+                <strong>{report.invima.details_count}</strong>
               </div>
               <div className="metric">
                 <FlaskConical size={22} />
@@ -727,7 +685,7 @@ function App() {
                     ))}
                   </div>
                 ) : (
-                  <EmptyState text="Faltan textos de indicacion INVIMA por presentacion para este medicamento. Los registros CUM no sustituyen este texto regulatorio." />
+                  <EmptyState text="Faltan textos de indicacion INVIMA por presentacion para este medicamento." />
                 )}
               </Panel>
 

@@ -38,6 +38,5 @@ If the product later automates clinical recommendations or patient-specific deci
 ## Source notes
 
 - INVIMA open data license: https://www.invima.gov.co/biblioteca/licencia-abierta-datos-abiertos-invimapdf
-- Datos Abiertos Colombia terms: https://herramientas.datos.gov.co/terminos
 - Ley 1712 de 2014, transparency and access to public information: https://www1.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=56882
 - INVIMA software as possible medical device: https://www.invima.gov.co/node/184

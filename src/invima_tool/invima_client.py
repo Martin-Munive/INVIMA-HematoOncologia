@@ -43,5 +43,10 @@ def fetch_invima_detail_by_expediente(
             "INVIMA detail endpoint responded, but did not return a complete product "
             "detail for the supplied expediente/cdgprod."
         )
+    if detail.expediente != expediente:
+        raise ValueError(
+            "INVIMA detail endpoint returned a different expediente "
+            f"({detail.expediente}) than requested ({expediente})."
+        )
     object.__setattr__(detail, "cdgprod", cdgprod)
     return detail

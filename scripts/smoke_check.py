@@ -50,8 +50,7 @@ def check_report_contract(api_base: str, drug: str, timeout: int) -> CheckResult
         "completion": isinstance(completion, dict),
         "invima": isinstance(invima, dict),
         "invima.details": isinstance(invima, dict) and isinstance(invima.get("details"), list),
-        "invima.open_cum": isinstance(invima, dict) and isinstance(invima.get("open_cum"), list),
-        "invima.open_cum_count": isinstance(invima, dict) and isinstance(invima.get("open_cum_count"), int),
+        "invima.details_count": isinstance(invima, dict) and isinstance(invima.get("details_count"), int),
         "source_policy": isinstance(data.get("source_policy"), dict),
     }
     missing = [name for name, ok in required.items() if not ok]
@@ -60,7 +59,7 @@ def check_report_contract(api_base: str, drug: str, timeout: int) -> CheckResult
     return CheckResult(
         "report_contract",
         True,
-        f"details={invima.get('details_count', 0)} open_cum={invima.get('open_cum_count', 0)}",
+        f"details={invima.get('details_count', 0)}",
     )
 
 

@@ -73,25 +73,52 @@ def _find_value(rows: list[list[str]], key: str) -> str:
     return ""
 
 
+def _find_principle_and_concentration(rows: list[list[str]]) -> tuple[str, str]:
+    for idx, row in enumerate(rows):
+        normalized = [clean_ws(cell).lower() for cell in row]
+        if "principio" not in normalized:
+            continue
+        principle_idx = normalized.index("principio")
+        concentration_idx = -1
+        for col_idx, value in enumerate(normalized):
+            if "cantidad" in value or "concentr" in value:
+                concentration_idx = col_idx
+                break
+        for candidate in rows[idx + 1 :]:
+            if len(candidate) <= principle_idx:
+                continue
+            principle = clean_ws(candidate[principle_idx])
+            concentration = clean_ws(candidate[concentration_idx]) if concentration_idx >= 0 and len(candidate) > concentration_idx else ""
+            if principle and principle.lower() not in {"principio", "atc", "rol"}:
+                return principle, concentration
+    return "", ""
+
+
+def _find_atc(rows: list[list[str]]) -> str:
+    for idx, row in enumerate(rows):
+        normalized = [clean_ws(cell).lower() for cell in row]
+        if "atc" not in normalized:
+            continue
+        for candidate in rows[idx + 1 :]:
+            for cell in candidate:
+                value = clean_ws(cell)
+                if re.match(r"^[A-Z]\d{2}[A-Z]{2}\d{2}$", value):
+                    return value
+    for row in rows:
+        for cell in row:
+            value = clean_ws(cell)
+            if re.match(r"^[A-Z]\d{2}[A-Z]{2}\d{2}$", value):
+                return value
+    return ""
+
+
 def parse_invima_detail_html(path_or_html: str | Path, *, is_html: bool = False) -> InvimaDetail:
     html = str(path_or_html) if is_html else read_text_guess(path_or_html)
     rows = parse_table_rows(html)
     fields = _field_pairs(rows)
 
-    atc = ""
-    for row in rows:
-        if row and row[0].upper().startswith("L") and len(row[0]) >= 5:
-            atc = row[0]
-            break
-
-    principio = ""
-    concentracion = ""
-    for row in rows:
-        if len(row) >= 3 and row[0] and row[0].upper() not in {"PRINCIPIO", "ATC"}:
-            # The concentration table appears after a header: ["Principio", ...].
-            if row[0].upper().startswith("PACLITAXEL"):
-                principio, concentracion = row[0], row[1]
-                break
+    principio, concentracion = _find_principle_and_concentration(rows)
+    atc = _find_atc(rows)
 
     return InvimaDetail(
         expediente=_find_value(rows, "Expediente Sanitario"),

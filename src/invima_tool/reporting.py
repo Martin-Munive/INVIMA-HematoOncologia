@@ -53,7 +53,6 @@ def build_drug_suggestions(db_path: str | Path, query: str, *, limit: int = 12) 
         candidates: dict[str, dict] = {}
         sources = (
             ("manual_drug_profiles", "nombre", "Perfil manual"),
-            ("invima_open_cum", "principio_activo", "CUM"),
             ("invima_details", "principio_activo", "INVIMA detalle"),
             ("unirs_indications", "principio_activo", "UNIRS"),
             ("pospopuli_results", "nombre", "POS Populi"),
@@ -103,32 +102,6 @@ def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = F
             )
             if _like_any(row, ("principio_activo", "producto"), terms)
         ]
-        open_cum = [
-            dict(row)
-            for row in con.execute(
-                """
-                SELECT expediente, producto, titular, registro_sanitario, fecha_expedicion,
-                       fecha_vencimiento, estado_registro, expediente_cum, consecutivo_cum,
-                       cantidad_cum, descripcion_comercial, estado_cum, fecha_activo,
-                       fecha_inactivo, muestra_medica, unidad, atc, descripcion_atc,
-                       via_administracion, concentracion, principio_activo, unidad_medida,
-                       cantidad, unidad_referencia, forma_farmaceutica, nombre_rol,
-                       tipo_rol, modalidad, ium, source_dataset, imported_at
-                FROM invima_open_cum
-                ORDER BY producto, expediente, consecutivo_cum
-                """
-            )
-            if _like_any(row, ("principio_activo", "producto", "descripcion_atc"), terms)
-        ]
-        if not registration_counts and open_cum:
-            registration_counts = [
-                {
-                    "estado": row["estado_registro"],
-                    "principio_activo": row["principio_activo"],
-                    "producto": row["producto"],
-                }
-                for row in open_cum
-            ]
         counts_by_status: dict[str, int] = {}
         for row in registration_counts:
             counts_by_status[row["estado"]] = counts_by_status.get(row["estado"], 0) + 1
@@ -190,7 +163,7 @@ def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = F
         con.close()
 
     missing = []
-    if not registration_counts and not open_cum:
+    if not registration_counts:
         missing.append("INVIMA registrations")
     if not details:
         missing.append("INVIMA details/indications")
@@ -213,15 +186,13 @@ def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = F
             "registration_counts": registration_counts,
             "details_count": len(details),
             "details": details,
-            "open_cum_count": len(open_cum),
-            "open_cum": open_cum,
         },
         "unirs": {"count": len(unirs), "items": unirs},
         "pospopuli": {"count": len(pos), "items": pos},
         "clinical_safety": get_clinical_safety_profile(query),
         "source_policy": {
             "regulatory_indications_source": "INVIMA details only",
-            "registration_source": "INVIMA HTML results or Datos Abiertos CUM when available",
+            "registration_source": "INVIMA HTML results",
             "coverage_source": "POS Populi / UPC",
             "complementary_indications_source": "UNIRS",
             "manual_profile_source": "curated local oncology profile",

@@ -4,6 +4,18 @@ from __future__ import annotations
 PACLitaxel_SAFETY_PROFILE = {
     "drug": "PACLITAXEL",
     "source_status": "curated_from_external_scientific_sources",
+    "definition": "Antineoplasico de la familia de los taxanos usado en varios tumores solidos; actua como inhibidor de microtubulos.",
+    "mechanism": "Se une a la tubulina, favorece el ensamblaje y estabilizacion de microtubulos e impide su despolimerizacion; esto bloquea la reorganizacion normal del citoesqueleto necesaria para mitosis y otras funciones celulares.",
+    "mechanism_sources": [
+        {
+            "label": "NCI Drug Dictionary - paclitaxel",
+            "url": "https://www.cancer.gov/publications/dictionaries/cancer-drug/def/paclitaxel",
+        },
+        {
+            "label": "DailyMed paclitaxel prescribing information",
+            "url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=paclitaxel",
+        },
+    ],
     "sources": [
         {
             "label": "Cancer Care Ontario PACLitaxel monograph",

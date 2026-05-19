@@ -114,6 +114,9 @@ type PosPopuliItem = {
 type ClinicalSafety = {
   drug: string;
   source_status: string;
+  definition?: string;
+  mechanism?: string;
+  mechanism_sources?: { label: string; url: string }[];
   sources: { label: string; url: string }[];
   adverse_reactions_by_system: { system: string; items: string[] }[];
   hypersensitivity: {
@@ -221,15 +224,6 @@ function displayConcentration(presentation: { producto: string; concentracion: s
   return presentation.forma_farmaceutica || 'Sin dato';
 }
 
-function displayCumConcentration(item: InvimaOpenCum) {
-  const amount = cleanNumber(item.cantidad);
-  const unit = item.unidad_medida || item.unidad;
-  const reference = item.unidad_referencia;
-  if (amount && unit && reference) return `${amount} ${unit} / ${reference}`;
-  if (amount && unit) return `${amount} ${unit}`;
-  return displayConcentration(item);
-}
-
 function buildRegulatorySummary(details: InvimaDetail[]) {
   const grouped = new Map<string, RegulatoryIndicationSummary>();
 
@@ -334,6 +328,9 @@ function selectedDrugName(report: DrugReport) {
 }
 
 function localDrugDescription(report: DrugReport) {
+  if (report.clinical_safety?.definition && report.clinical_safety?.mechanism) {
+    return `${report.clinical_safety.definition} ${report.clinical_safety.mechanism}`;
+  }
   if (report.manual_profile?.mecanismo) return report.manual_profile.mecanismo;
   const atcDescription = report.invima.open_cum.find((item) => item.descripcion_atc)?.descripcion_atc;
   if (atcDescription) return `Clasificacion ATC registrada: ${atcDescription}.`;
@@ -502,8 +499,9 @@ function App() {
           </div>
         </div>
         <div className="system-strip">
-          <span>API LOCAL</span>
-          <strong>{API_BASE}</strong>
+          <strong>Martin Munive</strong>
+          <span>Medico General</span>
+          <span>Analista y programador de software</span>
         </div>
       </header>
 
@@ -623,33 +621,6 @@ function App() {
                 ) : (
                   <EmptyState text="No se detectaron patologias en el texto local de indicaciones INVIMA." />
                 )}
-                <div className="subsection-title">Presentaciones CUM vigentes en Datos Abiertos</div>
-                {report.invima.open_cum.length ? (
-                  <div className="cum-list">
-                    {report.invima.open_cum.map((item) => (
-                      <details className="detail-row cum-row" key={`${item.expediente}-${item.consecutivo_cum}-${item.ium || item.producto}`}>
-                        <summary className="detail-head">
-                          <ChevronDown size={15} aria-hidden="true" />
-                          <strong>{item.producto}</strong>
-                          <span>{displayCumConcentration(item)}</span>
-                          <small>Abrir CUM</small>
-                        </summary>
-                        <div className="detail-meta">
-                          <span>{item.registro_sanitario}</span>
-                          <span>{item.estado_registro} / CUM {item.estado_cum}</span>
-                          <span>{item.forma_farmaceutica || 'Sin forma'}</span>
-                          <span>{item.via_administracion || 'Sin via'}</span>
-                        </div>
-                        <p><strong>Titular:</strong> {item.titular || 'Sin dato'}</p>
-                        <p><strong>Principio activo:</strong> {item.principio_activo || 'Sin dato'}</p>
-                        <p><strong>Presentacion:</strong> {item.descripcion_comercial || 'Sin descripcion comercial'}</p>
-                        <p><strong>Fuente:</strong> {item.source_dataset} · importado localmente {item.imported_at || 'sin fecha'}</p>
-                      </details>
-                    ))}
-                  </div>
-                ) : (
-                  <EmptyState text="No hay presentaciones CUM importadas desde Datos Abiertos para este medicamento." />
-                )}
                 <div className="subsection-title">UNIRS en el mismo informe</div>
                 {unirsSummary.length ? (
                   <div className="unirs-summary-list">
@@ -723,7 +694,9 @@ function App() {
                         {[...report.clinical_safety.extravasation.prevention, ...report.clinical_safety.extravasation.management].map((item) => <li key={item}>{item}</li>)}
                       </ul>
                     </div>
-                    <div className="source-note">Fuentes curadas: {report.clinical_safety.sources.map((source) => source.label).join('; ')}.</div>
+                    <div className="source-note">
+                      Fuentes curadas: {[...(report.clinical_safety.mechanism_sources ?? []), ...report.clinical_safety.sources].map((source) => source.label).join('; ')}.
+                    </div>
                       </>
                     )}
                     {!report.clinical_safety && report.manual_profile && (
@@ -734,24 +707,28 @@ function App() {
               </Panel>
 
               <Panel title="Indicaciones INVIMA por presentacion" icon={<ShieldCheck size={16} />} className="detail-panel">
-                <div className="table-list">
-                  {report.invima.details.map((item) => (
-                    <details key={`${item.expediente}-${item.cdgprod}`} className="detail-row">
-                      <summary className="detail-head">
-                        <ChevronDown size={15} aria-hidden="true" />
-                        <strong>{item.producto}</strong>
-                        <span>{item.registro_sanitario}</span>
-                        <small>Abrir fuente</small>
-                      </summary>
-                      <div className="detail-meta">
-                        <span>{item.forma_farmaceutica}</span>
-                        <span>{item.principio_activo}</span>
-                        <span>{item.concentracion}</span>
-                      </div>
-                      <p>{item.indicaciones}</p>
-                    </details>
-                  ))}
-                </div>
+                {report.invima.details.length ? (
+                  <div className="table-list">
+                    {report.invima.details.map((item) => (
+                      <details key={`${item.expediente}-${item.cdgprod}`} className="detail-row">
+                        <summary className="detail-head">
+                          <ChevronDown size={15} aria-hidden="true" />
+                          <strong>{item.producto}</strong>
+                          <span>{item.registro_sanitario}</span>
+                          <small>Abrir fuente</small>
+                        </summary>
+                        <div className="detail-meta">
+                          <span>{item.forma_farmaceutica}</span>
+                          <span>{item.principio_activo}</span>
+                          <span>{item.concentracion}</span>
+                        </div>
+                        <p>{item.indicaciones}</p>
+                      </details>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState text="Faltan textos de indicacion INVIMA por presentacion para este medicamento. Los registros CUM no sustituyen este texto regulatorio." />
+                )}
               </Panel>
 
               <Panel title="UNIRS texto original" icon={<FlaskConical size={16} />} className="detail-panel">

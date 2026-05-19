@@ -146,6 +146,12 @@ type DrugReport = {
   source_policy: Record<string, string>;
 };
 
+type DrugSuggestion = {
+  name: string;
+  sources: string[];
+  count: number;
+};
+
 const API_BASE = 'http://127.0.0.1:8000';
 
 type RegulatoryIndicationSummary = {
@@ -317,15 +323,99 @@ function normalizeReport(raw: DrugReport): DrugReport {
   };
 }
 
+function selectedDrugName(report: DrugReport) {
+  return (
+    report.manual_profile?.nombre ||
+    report.invima.details[0]?.principio_activo ||
+    report.invima.open_cum[0]?.principio_activo ||
+    report.unirs.items[0]?.principio_activo ||
+    report.query
+  );
+}
+
+function localDrugDescription(report: DrugReport) {
+  if (report.manual_profile?.mecanismo) return report.manual_profile.mecanismo;
+  const atcDescription = report.invima.open_cum.find((item) => item.descripcion_atc)?.descripcion_atc;
+  if (atcDescription) return `Clasificacion ATC registrada: ${atcDescription}.`;
+  if (report.clinical_safety) return 'Perfil clinico curado disponible para seguridad, hipersensibilidad y manejo de extravasacion.';
+  return 'Ficha consolidada local con registros, presentaciones y fuentes disponibles para el medicamento seleccionado.';
+}
+
+function DrugHeader({ report, financed }: { report: DrugReport; financed: boolean }) {
+  const firstDetail = report.invima.details[0];
+  const firstCum = report.invima.open_cum[0];
+  const title = selectedDrugName(report);
+  const posNames = report.pospopuli.items.map((item) => item.nombre).join(', ');
+  return (
+    <section className="drug-header">
+      <div className="drug-title-block">
+        <span className="eyebrow">Medicamento seleccionado</span>
+        <h1>{title}</h1>
+        <p>{localDrugDescription(report)}</p>
+      </div>
+      <div className="drug-facts">
+        <div>
+          <span>UPC / POS Populi</span>
+          <strong>{financed ? 'Financiado' : 'No encontrado'}</strong>
+          {posNames && <small>{posNames}</small>}
+        </div>
+        <div>
+          <span>ATC</span>
+          <strong>{firstDetail?.atc || firstCum?.atc || 'Sin dato'}</strong>
+          <small>{firstCum?.descripcion_atc || firstDetail?.forma_farmaceutica || 'Fuente local'}</small>
+        </div>
+        <div>
+          <span>Registros / CUM</span>
+          <strong>{report.invima.details_count} / {report.invima.open_cum_count}</strong>
+          <small>Detalle INVIMA / presentaciones CUM</small>
+        </div>
+        <div>
+          <span>UNIRS</span>
+          <strong>{report.unirs.count}</strong>
+          <small>Registros complementarios</small>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function EmptyDashboard() {
+  return (
+    <section className="empty-dashboard">
+      <div className="empty-report-slot">
+        <FileSearch size={18} />
+        <span>Resumen regulatorio pendiente</span>
+      </div>
+      <div className="empty-report-slot">
+        <ShieldCheck size={18} />
+        <span>Indicaciones y presentaciones pendientes</span>
+      </div>
+      <div className="empty-report-slot">
+        <AlertTriangle size={18} />
+        <span>Seguridad clinica pendiente</span>
+      </div>
+      <div className="empty-report-slot">
+        <Database size={18} />
+        <span>Fuentes pendientes</span>
+      </div>
+    </section>
+  );
+}
+
 function App() {
-  const [query, setQuery] = React.useState('PACLITAXEL');
+  const [query, setQuery] = React.useState('');
   const [report, setReport] = React.useState<DrugReport | null>(null);
+  const [suggestions, setSuggestions] = React.useState<DrugSuggestion[]>([]);
+  const [suggestionIndex, setSuggestionIndex] = React.useState(0);
+  const [suggestionsOpen, setSuggestionsOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
-  const loadReport = React.useCallback(async () => {
-    const term = query.trim();
+  const loadReport = React.useCallback(async (termOverride?: string) => {
+    const term = (termOverride ?? query).trim();
     if (!term) return;
+    setQuery(term);
+    setSuggestionsOpen(false);
     setLoading(true);
     setError('');
     try {
@@ -343,13 +433,61 @@ function App() {
   }, [query]);
 
   React.useEffect(() => {
-    loadReport();
-  }, []);
+    const term = query.trim();
+    if (term.length < 2) {
+      setSuggestions([]);
+      setSuggestionsOpen(false);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/drugs/suggest?q=${encodeURIComponent(term)}&limit=10`, { signal: controller.signal });
+        if (!response.ok) return;
+        const payload = await response.json();
+        setSuggestions(payload.items ?? []);
+        setSuggestionIndex(0);
+        setSuggestionsOpen(Boolean(payload.items?.length));
+      } catch (err) {
+        if (!(err instanceof DOMException && err.name === 'AbortError')) {
+          setSuggestions([]);
+          setSuggestionsOpen(false);
+        }
+      }
+    }, 160);
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [query]);
+
+  function handleSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'ArrowDown' && suggestions.length) {
+      event.preventDefault();
+      setSuggestionIndex((current) => Math.min(current + 1, suggestions.length - 1));
+      setSuggestionsOpen(true);
+      return;
+    }
+    if (event.key === 'ArrowUp' && suggestions.length) {
+      event.preventDefault();
+      setSuggestionIndex((current) => Math.max(current - 1, 0));
+      setSuggestionsOpen(true);
+      return;
+    }
+    if (event.key === 'Tab' && suggestionsOpen && suggestions[0]) {
+      event.preventDefault();
+      setQuery(suggestions[0].name);
+      setSuggestionsOpen(false);
+      return;
+    }
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      loadReport(suggestionsOpen && suggestions[suggestionIndex] ? suggestions[suggestionIndex].name : query);
+    }
+  }
 
   const financed = Boolean(report?.pospopuli.items.some((item) => item.financiacion));
   const complete = Boolean(report?.completion.is_complete_for_current_sources);
-  const firstDetail = report?.invima.details[0];
-  const firstCum = report?.invima.open_cum[0];
   const regulatorySummary = report ? buildRegulatorySummary(report.invima.details) : [];
   const unirsSummary = report ? buildUnirsSummary(report.unirs.items) : [];
 
@@ -371,10 +509,40 @@ function App() {
 
       <main className="workspace">
         <section className="search-band">
-          <div className="search-box">
-            <Search size={20} />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && loadReport()} />
-            <button onClick={loadReport} disabled={loading}>{loading ? 'Consultando' : 'Buscar'}</button>
+          <div className="search-wrap">
+            <div className="search-box">
+              <Search size={18} />
+              <input
+                value={query}
+                placeholder="Buscar medicamento por principio activo"
+                onBlur={() => window.setTimeout(() => setSuggestionsOpen(false), 140)}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setReport(null);
+                }}
+                onFocus={() => setSuggestionsOpen(Boolean(suggestions.length))}
+                onKeyDown={handleSearchKeyDown}
+              />
+              <button onClick={() => loadReport()} disabled={loading || !query.trim()}>{loading ? 'Consultando' : 'Buscar'}</button>
+            </div>
+            {suggestionsOpen && (
+              <div className="suggestion-list">
+                {suggestions.map((item, index) => (
+                  <button
+                    className={index === suggestionIndex ? 'suggestion active' : 'suggestion'}
+                    key={item.name}
+                    onMouseDown={(event) => {
+                      event.preventDefault();
+                      loadReport(item.name);
+                    }}
+                    type="button"
+                  >
+                    <strong>{item.name}</strong>
+                    <span>{item.sources.join(' · ')} · {item.count} coincidencias</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           {error && <div className="error-line"><AlertTriangle size={16} /> {error}</div>}
         </section>
@@ -389,18 +557,11 @@ function App() {
           </section>
         )}
 
-        {!loading && !report && (
-          <section className="fallback-panel">
-            <FileSearch size={22} />
-            <div>
-              <strong>Busca un medicamento</strong>
-              <p>Escribe un principio activo para consultar registros, presentaciones, fuentes y perfil clinico disponible.</p>
-            </div>
-          </section>
-        )}
+        {!loading && !report && <EmptyDashboard />}
 
         {report && (
           <>
+            <DrugHeader report={report} financed={financed} />
             <section className="summary-grid">
               <div className={`metric ${statusClass(complete)}`}>
                 <BadgeCheck size={22} />
@@ -419,8 +580,8 @@ function App() {
               </div>
               <div className="metric">
                 <FlaskConical size={22} />
-                <span>ATC principal</span>
-                <strong>{firstDetail?.atc || firstCum?.atc || 'Sin dato'}</strong>
+                <span>UNIRS</span>
+                <strong>{report.unirs.count}</strong>
               </div>
             </section>
 
@@ -591,16 +752,6 @@ function App() {
                     </details>
                   ))}
                 </div>
-              </Panel>
-
-              <Panel title="UPC / POS Populi" icon={<BadgeCheck size={16} />} className="side-panel">
-                {report.pospopuli.items.length ? report.pospopuli.items.map((item) => (
-                  <div className="source-card" key={item.nombre}>
-                    <strong>{item.nombre}</strong>
-                    <span>{item.codigo_atc}</span>
-                    <p>{item.financiacion || 'Sin financiacion registrada'}</p>
-                  </div>
-                )) : <EmptyState text="No hay resultados POS Populi locales." />}
               </Panel>
 
               <Panel title="UNIRS texto original" icon={<FlaskConical size={16} />} className="detail-panel">

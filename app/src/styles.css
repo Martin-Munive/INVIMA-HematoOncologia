@@ -2,6 +2,7 @@
   color: #f8fafc;
   background: #020617;
   font-family: "Segoe UI", Arial, system-ui, sans-serif;
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -31,12 +32,12 @@ input {
 }
 
 .topbar {
-  min-height: 74px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  padding: 12px clamp(12px, 3vw, 18px);
+  gap: 14px;
+  padding: 10px clamp(10px, 3vw, 16px);
   border-bottom: 1px solid rgba(0, 229, 255, 0.28);
   background: rgba(2, 6, 23, 0.96);
 }
@@ -44,14 +45,14 @@ input {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   color: #00e5ff;
 }
 
 .brand-title {
-  font-weight: 750;
+  font-weight: 650;
   letter-spacing: 0;
-  font-size: clamp(0.9rem, 2vw, 1.25rem);
+  font-size: 1rem;
 }
 
 .brand-subtitle {
@@ -76,23 +77,27 @@ input {
 .workspace {
   width: min(1540px, 100%);
   margin: 0 auto;
-  padding: clamp(10px, 3vw, 18px);
+  padding: clamp(10px, 3vw, 16px);
 }
 
 .search-band {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.search-wrap {
+  position: relative;
 }
 
 .search-box {
-  min-height: 58px;
+  min-height: 48px;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 10px;
+  padding: 8px 10px;
   border: 1px solid rgba(0, 229, 255, 0.28);
   background: rgba(15, 23, 42, 0.72);
   border-radius: 8px;
@@ -108,8 +113,8 @@ input {
   background: transparent;
   border: none;
   outline: none;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.92rem;
+  font-weight: 500;
   letter-spacing: 0;
 }
 
@@ -118,10 +123,64 @@ input {
   background: rgba(0, 229, 255, 0.12);
   color: #00e5ff;
   border-radius: 6px;
-  padding: 10px 14px;
-  font-weight: 700;
+  padding: 8px 12px;
+  font-weight: 600;
   letter-spacing: 0;
   cursor: pointer;
+}
+
+.search-box button:disabled {
+  cursor: not-allowed;
+  opacity: 0.54;
+}
+
+.suggestion-list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 280px;
+  overflow: auto;
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.98);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.34);
+}
+
+.suggestion {
+  width: 100%;
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  border: none;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  background: transparent;
+  color: #cbd5e1;
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggestion:last-child {
+  border-bottom: none;
+}
+
+.suggestion:hover,
+.suggestion.active {
+  background: rgba(0, 229, 255, 0.1);
+}
+
+.suggestion strong {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.suggestion span {
+  color: #94a3b8;
+  font-size: 0.78rem;
 }
 
 .error-line {
@@ -129,16 +188,16 @@ input {
   align-items: center;
   gap: 8px;
   color: #ff6b8a;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .fallback-panel {
-  min-height: 132px;
+  min-height: 110px;
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 16px;
-  padding: 18px;
+  padding: 14px;
   border: 1px solid rgba(0, 229, 255, 0.22);
   border-radius: 8px;
   background: rgba(15, 23, 42, 0.72);
@@ -152,7 +211,8 @@ input {
 
 .fallback-panel strong {
   color: #f8fafc;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .fallback-panel p {
@@ -160,16 +220,103 @@ input {
   color: #94a3b8;
 }
 
+.empty-dashboard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.empty-report-slot {
+  min-height: 112px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px dashed rgba(0, 229, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.42);
+  color: #64748b;
+  padding: 14px;
+}
+
+.empty-report-slot svg {
+  color: #00e5ff;
+}
+
+.drug-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(420px, 0.9fr);
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 16px;
+  border: 1px solid rgba(0, 229, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.66);
+}
+
+.drug-title-block {
+  min-width: 0;
+}
+
+.eyebrow {
+  color: #00e5ff;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.drug-title-block h1 {
+  margin: 4px 0 6px;
+  color: #f8fafc;
+  font-size: 1.5rem;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.drug-title-block p {
+  max-width: 92ch;
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 0.88rem;
+}
+
+.drug-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.drug-facts div {
+  min-height: 76px;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.38);
+}
+
+.drug-facts span,
+.drug-facts small {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.72rem;
+}
+
+.drug-facts strong {
+  display: block;
+  margin: 3px 0;
+  color: #f8fafc;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .metric {
-  min-height: 86px;
-  padding: 14px;
+  min-height: 70px;
+  padding: 10px;
   border: 1px solid rgba(0, 229, 255, 0.2);
   border-radius: 8px;
   background: rgba(15, 23, 42, 0.7);
@@ -192,7 +339,8 @@ input {
 }
 
 .metric strong {
-  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-size: 1.05rem;
+  font-weight: 600;
 }
 
 .status-ok strong,
@@ -209,7 +357,7 @@ input {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(320px, 0.85fr);
   grid-template-areas:
-    "regulatory side-a"
+    "regulatory regulatory"
     "clinical clinical"
     "detail-invima detail-invima"
     "detail-unirs detail-unirs"
@@ -219,7 +367,7 @@ input {
 }
 
 .hud-panel {
-  min-height: 180px;
+  min-height: 150px;
   border: 1px solid rgba(0, 229, 255, 0.22);
   background: rgba(15, 23, 42, 0.64);
   backdrop-filter: blur(12px);
@@ -245,10 +393,6 @@ input {
   grid-column: 1 / -1;
 }
 
-.side-panel:nth-of-type(4) {
-  grid-area: side-a;
-}
-
 .side-panel:last-child {
   grid-area: side-b;
 }
@@ -258,21 +402,21 @@ input {
 }
 
 .panel-title {
-  min-height: 36px;
+  min-height: 32px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 7px 10px;
   border-bottom: 1px solid rgba(0, 229, 255, 0.18);
   background: linear-gradient(90deg, rgba(0, 229, 255, 0.14), transparent);
   color: #00e5ff;
   letter-spacing: 0;
-  font-size: 0.84rem;
-  font-weight: 700;
+  font-size: 0.76rem;
+  font-weight: 600;
 }
 
 .panel-body {
-  padding: 12px;
+  padding: 10px;
   overflow: auto;
 }
 
@@ -286,8 +430,8 @@ input {
   border: 1px solid rgba(0, 229, 255, 0.24);
   background: rgba(2, 6, 23, 0.52);
   color: #cbd5e1;
-  padding: 8px 10px;
-  font-size: 0.78rem;
+  padding: 6px 9px;
+  font-size: 0.72rem;
   border-radius: 999px;
 }
 
@@ -319,8 +463,8 @@ input {
 
 .indication-summary-head strong {
   color: #f8fafc;
-  font-size: 0.92rem;
-  font-weight: 650;
+  font-size: 0.84rem;
+  font-weight: 600;
 }
 
 .indication-summary-head span {
@@ -403,7 +547,7 @@ input {
 .presentation-line {
   border-top: 1px solid rgba(148, 163, 184, 0.12);
   color: #cbd5e1;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
 }
 
 .presentation-line span:nth-child(2),
@@ -460,7 +604,7 @@ input {
   border: 1px solid rgba(255, 191, 71, 0.45);
   color: #ffbf47;
   padding: 10px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .text-list h3 {
@@ -474,15 +618,15 @@ input {
   margin: 8px 0 0;
   color: #cbd5e1;
   line-height: 1.48;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
 }
 
 .subsection-title {
   color: #00e5ff;
   margin-top: 14px;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   letter-spacing: 0;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .table-list {
@@ -496,7 +640,7 @@ input {
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 8px;
   background: rgba(2, 6, 23, 0.46);
-  padding: 12px;
+  padding: 10px;
 }
 
 .detail-head {
@@ -514,7 +658,7 @@ input {
 
 .detail-head strong {
   color: #f8fafc;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .detail-head svg,
@@ -608,7 +752,7 @@ input {
 
 .source-card strong {
   color: #f8fafc;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .source-detail summary {
@@ -640,7 +784,7 @@ input {
 .source-policy strong {
   color: #00e5ff;
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .source-policy span,
@@ -662,13 +806,14 @@ input {
 .clinical-baseline h3 {
   margin: 4px 0 8px;
   color: #f8fafc;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .safety-column p,
 .safety-column li {
   color: #cbd5e1;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   line-height: 1.48;
 }
 
@@ -689,7 +834,7 @@ input {
   align-items: center;
   color: #f8fafc;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
   list-style: none;
 }
 
@@ -813,7 +958,9 @@ input {
 
 @media (max-width: 980px) {
   .summary-grid,
-  .content-grid {
+  .content-grid,
+  .drug-header,
+  .empty-dashboard {
     grid-template-columns: 1fr;
     grid-template-areas: none;
   }
@@ -825,10 +972,13 @@ input {
   .regulatory-panel,
   .clinical-panel,
   .detail-panel,
-  .side-panel:nth-of-type(4),
   .side-panel:last-child {
     grid-area: auto;
     grid-column: auto;
+  }
+
+  .drug-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .unirs-grid {
@@ -910,6 +1060,23 @@ input {
 
   .summary-grid {
     gap: 8px;
+  }
+
+  .suggestion {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .drug-header {
+    padding: 12px;
+  }
+
+  .drug-title-block h1 {
+    font-size: 1.24rem;
+  }
+
+  .drug-facts {
+    grid-template-columns: 1fr;
   }
 
   .metric {

@@ -32,6 +32,15 @@ class ApiTests(unittest.TestCase):
         self.assertIn("clinical_safety", body)
         self.assertIn("source_policy", body)
 
+    def test_drug_suggest_endpoint_shape(self):
+        client = TestClient(app)
+        response = client.get("/api/drugs/suggest?q=PACL&limit=5")
+
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["query"], "PACL")
+        self.assertIn("items", body)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -42,6 +42,51 @@ def _like_any(row: sqlite3.Row | dict, fields: tuple[str, ...], terms: list[str]
     return any(term.upper() in value for term in terms for value in values)
 
 
+def build_drug_suggestions(db_path: str | Path, query: str, *, limit: int = 12) -> list[dict]:
+    cleaned = " ".join(query.strip().split())
+    if len(cleaned) < 2:
+        return []
+
+    con = connect(db_path)
+    try:
+        init_db(con)
+        candidates: dict[str, dict] = {}
+        sources = (
+            ("manual_drug_profiles", "nombre", "Perfil manual"),
+            ("invima_open_cum", "principio_activo", "CUM"),
+            ("invima_details", "principio_activo", "INVIMA detalle"),
+            ("unirs_indications", "principio_activo", "UNIRS"),
+            ("pospopuli_results", "nombre", "POS Populi"),
+        )
+        for table, column, source in sources:
+            for row in con.execute(f"SELECT {column} AS name, COUNT(*) AS n FROM {table} WHERE {column} <> '' GROUP BY {column}"):
+                name = " ".join(str(row["name"] or "").split())
+                key = name.upper()
+                if not name:
+                    continue
+                item = candidates.setdefault(key, {"name": name, "sources": set(), "count": 0})
+                item["sources"].add(source)
+                item["count"] += int(row["n"] or 0)
+    finally:
+        con.close()
+
+    needle = cleaned.upper()
+    matched = [
+        item
+        for item in candidates.values()
+        if needle in item["name"].upper()
+    ]
+    matched.sort(key=lambda item: (0 if item["name"].upper().startswith(needle) else 1, len(item["name"]), item["name"]))
+    return [
+        {
+            "name": item["name"],
+            "sources": sorted(item["sources"]),
+            "count": item["count"],
+        }
+        for item in matched[:limit]
+    ]
+
+
 def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = False) -> dict:
     terms = _query_terms(query)
     con = connect(db_path)

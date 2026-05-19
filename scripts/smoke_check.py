@@ -64,6 +64,24 @@ def check_report_contract(api_base: str, drug: str, timeout: int) -> CheckResult
     )
 
 
+def check_suggest_contract(api_base: str, drug: str, timeout: int) -> CheckResult:
+    probe = drug[:4] if len(drug) >= 4 else drug
+    try:
+        data = _fetch_json(f"{api_base}/api/drugs/suggest?q={probe}&limit=5", timeout)
+    except (OSError, URLError, ValueError, json.JSONDecodeError) as exc:
+        return CheckResult("suggest_contract", False, str(exc))
+
+    items = data.get("items")
+    if not isinstance(items, list):
+        return CheckResult("suggest_contract", False, "items is not a list")
+    if not items:
+        return CheckResult("suggest_contract", False, "items is empty")
+    first = items[0]
+    if not isinstance(first, dict) or not {"name", "sources", "count"}.issubset(first):
+        return CheckResult("suggest_contract", False, "suggestion shape is invalid")
+    return CheckResult("suggest_contract", True, f"first={first.get('name')}")
+
+
 def check_frontend(frontend_url: str, timeout: int) -> CheckResult:
     try:
         status = _fetch_status(frontend_url, timeout)
@@ -83,6 +101,7 @@ def main() -> int:
     results = [
         check_api_health(args.api_base, args.timeout),
         check_report_contract(args.api_base, args.drug, args.timeout),
+        check_suggest_contract(args.api_base, args.drug, args.timeout),
         check_frontend(args.frontend_url, args.timeout),
     ]
 

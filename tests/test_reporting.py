@@ -8,7 +8,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from invima_tool.cli import DB_PATH
-from invima_tool.reporting import _query_terms, build_drug_report
+from invima_tool.reporting import _query_terms, build_drug_report, build_drug_suggestions
 
 
 class ReportingTests(unittest.TestCase):
@@ -21,6 +21,13 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("open_cum_count", report["invima"])
         self.assertIn("open_cum", report["invima"])
         self.assertIn("registration_source", report["source_policy"])
+
+    def test_drug_suggestions_shape(self):
+        if not DB_PATH.exists():
+            raise unittest.SkipTest("Base SQLite local no incluida en el repositorio publico")
+        suggestions = build_drug_suggestions(DB_PATH, "PACL", limit=5)
+        self.assertTrue(any(item["name"] == "PACLITAXEL" for item in suggestions))
+        self.assertIn("sources", suggestions[0])
 
     def test_paclitaxel_report_shape_when_local_db_exists(self):
         if not DB_PATH.exists():

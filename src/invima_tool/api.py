@@ -4,7 +4,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from .cli import DB_PATH
-from .reporting import build_drug_report
+from .reporting import build_drug_report, build_drug_suggestions
 
 
 app = FastAPI(
@@ -36,3 +36,8 @@ def health() -> dict[str, str]:
 @app.get("/api/drugs/{query}/report")
 def drug_report(query: str, only_vigente: bool = Query(default=True)) -> dict:
     return build_drug_report(DB_PATH, query, only_vigente=only_vigente)
+
+
+@app.get("/api/drugs/suggest")
+def drug_suggest(q: str = Query(default="", min_length=0), limit: int = Query(default=12, ge=1, le=25)) -> dict:
+    return {"query": q, "items": build_drug_suggestions(DB_PATH, q, limit=limit)}

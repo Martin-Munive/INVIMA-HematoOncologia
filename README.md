@@ -144,12 +144,18 @@ Consultar reporte de un medicamento:
 http://127.0.0.1:8000/api/drugs/PACLITAXEL/report?only_vigente=true
 ```
 
+Consultar sugerencias para autocompletar la busqueda:
+
+```text
+http://127.0.0.1:8000/api/drugs/suggest?q=PAC&limit=10
+```
+
 En terminos simples:
 
 - la base SQLite guarda los datos locales;
 - la funcion de reporte consulta SQLite y arma un diccionario estructurado;
 - FastAPI convierte ese diccionario en JSON;
-- el futuro frontend React/Vite llamara ese endpoint y lo mostrara como ficha visual.
+- el frontend React/Vite llama endpoints de sugerencia y reporte para llenar la ficha visual solo despues de una busqueda.
 
 ## Interfaz web local
 

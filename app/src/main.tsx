@@ -555,6 +555,9 @@ function App() {
                   ))}
                 </div>
                 <div className="subsection-title">Patologias detectadas en indicaciones INVIMA vigentes</div>
+                <div className="source-note">
+                  Esta vista usa expedientes vigentes o fuentes INVIMA oficiales curadas. Expedientes vencidos o con perdida de fuerza ejecutoria pueden aparecer en la consulta historica de INVIMA, pero no se cuentan aqui como soporte vigente de autorizacion.
+                </div>
                 {regulatorySummary.length ? (
                   <div className="regulatory-summary">
                     {regulatorySummary.map((item) => (
@@ -611,7 +614,7 @@ function App() {
                 ) : (
                   <EmptyState text="No hay indicaciones UNIRS locales para este medicamento." />
                 )}
-                <div className="source-note">Fuente: derivado del campo de indicaciones INVIMA por presentacion. Confirmar el texto completo en el panel inferior antes de autorizar uso.</div>
+                <div className="source-note">Fuente: derivado del campo de indicaciones INVIMA por presentacion vigente o de documento oficial INVIMA curado. Confirmar el texto completo en el panel inferior antes de autorizar uso.</div>
                 {report.completion.missing_sources.length > 0 && (
                   <div className="warning-box">Faltan fuentes: {report.completion.missing_sources.join(', ')}</div>
                 )}

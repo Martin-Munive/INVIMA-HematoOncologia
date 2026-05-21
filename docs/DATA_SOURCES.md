@@ -10,6 +10,8 @@ Not all sources have the same authority.
 
 An indication is shown as an **INVIMA indication** only when it comes from an INVIMA source. Other sources may complement, contrast or enrich the medication profile, but they do not replace regulatory authority.
 
+The operational report is conservative: it treats current authorization support as coming from active/vigente INVIMA records or curated official INVIMA documents. Expired records, cancelled records or records with `Perdida Fuerza Ejec` may be useful historical evidence, but they are not counted as current authorization support unless another official current source makes the indication applicable.
+
 ## Source hierarchy
 
 1. **INVIMA detail pages**: primary source for indication text by product or presentation.
@@ -34,6 +36,8 @@ Allowed local workflow:
 For detail imports, the pair `expediente + cdgprod` must come from the INVIMA results page or a permitted export that preserves those values.
 
 When a detail page is not available, an official INVIMA acta, inserto or IPP may be curated as a source document. The report must preserve the source label, URL and reference so the data is not confused with a downloaded detail-page record.
+
+INVIMA public searches may show active and historical records together. The application view uses `only_vigente=true` by default, so it does not present expired or loss-of-force records as current support for use authorization.
 
 ## Local data excluded from the repository
 

@@ -8,7 +8,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from invima_tool.cli import DB_PATH
-from invima_tool.reporting import _query_terms, build_drug_report, build_drug_suggestions
+from invima_tool.reporting import _query_terms, build_drug_report, build_drug_suggestions, build_drug_universe
 
 
 class ReportingTests(unittest.TestCase):
@@ -28,6 +28,12 @@ class ReportingTests(unittest.TestCase):
         suggestions = build_drug_suggestions(DB_PATH, "PACL", limit=5)
         self.assertTrue(any(item["name"] == "PACLITAXEL" for item in suggestions))
         self.assertIn("sources", suggestions[0])
+
+    def test_drug_universe_includes_curated_sources(self):
+        universe = build_drug_universe(DB_PATH)
+        names = {item["name"] for item in universe}
+
+        self.assertIn("ACIDO ZOLEDRONICO", names)
 
     def test_paclitaxel_report_shape_when_local_db_exists(self):
         if not DB_PATH.exists():

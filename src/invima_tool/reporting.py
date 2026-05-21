@@ -92,6 +92,47 @@ def build_drug_suggestions(db_path: str | Path, query: str, *, limit: int = 12) 
     ]
 
 
+def build_drug_universe(db_path: str | Path) -> list[dict]:
+    candidates: dict[str, dict] = {}
+
+    def add_candidate(name: str | None, source: str) -> None:
+        cleaned = " ".join(str(name or "").split())
+        if not cleaned:
+            return
+        key = cleaned.upper()
+        item = candidates.setdefault(key, {"name": cleaned, "sources": set()})
+        item["sources"].add(source)
+
+    db_path = Path(db_path)
+    if db_path.parent:
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+
+    con = connect(db_path)
+    try:
+        init_db(con)
+        for row in con.execute("SELECT nombre FROM manual_drug_profiles WHERE nombre <> ''"):
+            add_candidate(row["nombre"], "Perfil manual")
+        for row in con.execute("SELECT principio_activo FROM invima_registrations WHERE principio_activo <> ''"):
+            add_candidate(row["principio_activo"], "INVIMA registros")
+        for row in con.execute("SELECT principio_activo FROM invima_details WHERE principio_activo <> ''"):
+            add_candidate(row["principio_activo"], "INVIMA detalle")
+        for row in con.execute("SELECT principio_activo FROM unirs_indications WHERE principio_activo <> ''"):
+            add_candidate(row["principio_activo"], "UNIRS")
+        for row in con.execute("SELECT nombre FROM pospopuli_results WHERE nombre <> ''"):
+            add_candidate(row["nombre"], "POS Populi")
+    finally:
+        con.close()
+
+    for curated in get_curated_invima_suggestions():
+        for source in curated["sources"]:
+            add_candidate(curated["name"], source)
+
+    return [
+        {"name": item["name"], "sources": sorted(item["sources"])}
+        for item in sorted(candidates.values(), key=lambda value: value["name"].upper())
+    ]
+
+
 def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = False) -> dict:
     terms = _query_terms(query)
     con = connect(db_path)

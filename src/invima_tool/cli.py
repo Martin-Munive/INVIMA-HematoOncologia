@@ -20,7 +20,7 @@ from .storage import (
     upsert_invima_detail,
     upsert_invima_registrations,
 )
-from .reporting import build_drug_report
+from .reporting import build_drug_report, build_drug_universe
 from .text import normalize_key
 from .unirs_parser import filter_unirs, parse_unirs_xlsx
 
@@ -326,6 +326,64 @@ def cmd_report(args: argparse.Namespace) -> None:
     _print_json(build_drug_report(DB_PATH, args.query, only_vigente=args.only_vigente))
 
 
+def _read_query_file(path: str | Path) -> list[str]:
+    return [
+        line.strip()
+        for line in Path(path).read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+
+
+def cmd_export_reports(args: argparse.Namespace) -> None:
+    DATA_DIR.mkdir(exist_ok=True)
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+
+    universe = build_drug_universe(DB_PATH)
+    sources_by_name = {item["name"].upper(): item["sources"] for item in universe}
+    names = _read_query_file(args.query_file) if args.query_file else [item["name"] for item in universe]
+    if args.limit:
+        names = names[: args.limit]
+
+    reports = [
+        {
+            "drug": name,
+            "sources": sources_by_name.get(name.upper(), []),
+            "report": build_drug_report(DB_PATH, name, only_vigente=args.only_vigente),
+        }
+        for name in names
+    ]
+
+    if args.format == "jsonl":
+        with out.open("w", encoding="utf-8", newline="\n") as handle:
+            for item in reports:
+                handle.write(json.dumps(item, ensure_ascii=False))
+                handle.write("\n")
+    else:
+        out.write_text(
+            json.dumps(
+                {
+                    "count": len(reports),
+                    "only_vigente": args.only_vigente,
+                    "items": reports,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+
+    _print_json(
+        {
+            "out": str(out),
+            "format": args.format,
+            "only_vigente": args.only_vigente,
+            "exported": len(reports),
+            "universe": len(universe),
+        }
+    )
+
+
 def cmd_coverage(args: argparse.Namespace) -> None:
     con = connect(DB_PATH)
     init_db(con)
@@ -421,6 +479,14 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("query")
     report.add_argument("--only-vigente", action="store_true")
     report.set_defaults(func=cmd_report)
+
+    export_reports = sub.add_parser("export-reports")
+    export_reports.add_argument("--out", default=str(DATA_DIR / "reports.audit.jsonl"))
+    export_reports.add_argument("--format", choices=("jsonl", "json"), default="jsonl")
+    export_reports.add_argument("--only-vigente", action="store_true")
+    export_reports.add_argument("--query-file", default="")
+    export_reports.add_argument("--limit", type=int, default=0)
+    export_reports.set_defaults(func=cmd_export_reports)
 
     coverage = sub.add_parser("coverage")
     coverage.add_argument("--limit", type=int, default=0)

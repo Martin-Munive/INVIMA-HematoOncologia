@@ -51,6 +51,8 @@ Este repositorio no sustituye:
 
 Una indicacion solo debe presentarse como **indicacion INVIMA** si proviene de una fuente INVIMA real. La literatura cientifica o el perfil manual pueden complementar mecanismo, seguridad o manejo, pero no convierten una indicacion en autorizacion regulatoria.
 
+La interfaz operativa consulta por defecto expedientes vigentes o fuentes oficiales INVIMA curadas. Los expedientes vencidos, cancelados o con perdida de fuerza ejecutoria pueden servir como antecedente historico, pero no se cuentan como soporte vigente de autorizacion salvo que otra fuente oficial vigente haga aplicable la indicacion.
+
 ## Estado del proyecto
 
 Estado actual: **prototipo local con CLI, API FastAPI e interfaz React/Vite**.
@@ -64,6 +66,7 @@ Implementado:
 - fuentes INVIMA curadas desde actas oficiales cuando el detalle web no esta disponible localmente;
 - base local SQLite;
 - comandos de importacion, consulta y reporte;
+- exportacion local por lote de reportes para auditoria;
 - comando de cobertura para detectar medicamentos pendientes de detalle INVIMA;
 - importacion por carpeta de resultados INVIMA guardados despues del CAPTCHA manual;
 - API local FastAPI;
@@ -124,6 +127,14 @@ Generar reporte consolidado:
 ```powershell
 .\.INVIMA\Scripts\python.exe run_cli.py report PACLITAXEL --only-vigente
 ```
+
+Exportar reportes en lote para auditoria local:
+
+```powershell
+.\.INVIMA\Scripts\python.exe run_cli.py export-reports --only-vigente --out data\reports.audit.jsonl
+```
+
+Este comando toma el universo local de medicamentos desde SQLite y fuentes curadas, genera el mismo reporte estructurado que usa la API y lo guarda como `JSONL` o `JSON`. Sirve para revisar muchos medicamentos sin pasar por la interfaz web uno por uno.
 
 ## API local
 
@@ -238,6 +249,8 @@ El identificador `cdgprod` debe venir del resultado INVIMA o de una exportacion 
 
 Cuando no exista detalle web local, pueden usarse documentos oficiales INVIMA como actas, insertos o IPP, siempre que el reporte conserve fuente, URL y referencia. Estos datos se muestran como fuente INVIMA curada, no como descarga directa del endpoint de detalle.
 
+Para auditoria propia de medicamentos ya cargados en la base local, debe usarse el comando `export-reports`. Ese flujo no resuelve ni evade CAPTCHA: consulta los datos locales ya importados, arma cada ficha consolidada y permite detectar faltantes por medicamento.
+
 ### UNIRS
 
 Fuente complementaria de indicaciones no necesariamente equivalentes a indicacion INVIMA.
@@ -330,7 +343,7 @@ Componentes principales:
 - `storage.py`: inicializa y actualiza SQLite.
 - `reporting.py`: arma el reporte consolidado reusable para CLI/API.
 - `clinical_profiles.py`: perfiles de seguridad curados por medicamento cuando existe inmersion cientifica.
-- `cli.py`: define comandos de importacion, consulta y reporte.
+- `cli.py`: define comandos de importacion, consulta, reporte y exportacion por lote.
 
 ## Roadmap
 

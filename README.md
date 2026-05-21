@@ -61,6 +61,7 @@ Implementado:
 - parser de UNIRS desde XLSX;
 - parser de POS Populi desde HTML guardado;
 - parser de documento manual oncologico;
+- fuentes INVIMA curadas desde actas oficiales cuando el detalle web no esta disponible localmente;
 - base local SQLite;
 - comandos de importacion, consulta y reporte;
 - comando de cobertura para detectar medicamentos pendientes de detalle INVIMA;
@@ -69,6 +70,7 @@ Implementado:
 - frontend React/Vite con resumen regulatorio, UNIRS integrado y seguridad clinica curada para PACLITAXEL;
 - pruebas unitarias iniciales;
 - reporte consolidado funcional para `PACLITAXEL` en el entorno local de desarrollo.
+- piloto de `ACIDO ZOLEDRONICO` con indicaciones INVIMA desde actas oficiales y perfil clinico curado.
 
 Pendiente:
 
@@ -233,6 +235,8 @@ El formulario de busqueda principal puede usar CAPTCHA. Este proyecto no impleme
 5. descarga de detalles cuando existen `expediente` y `cdgprod`.
 
 El identificador `cdgprod` debe venir del resultado INVIMA o de una exportacion tecnica equivalente. No debe inferirse desde otras fuentes.
+
+Cuando no exista detalle web local, pueden usarse documentos oficiales INVIMA como actas, insertos o IPP, siempre que el reporte conserve fuente, URL y referencia. Estos datos se muestran como fuente INVIMA curada, no como descarga directa del endpoint de detalle.
 
 ### UNIRS
 

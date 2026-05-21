@@ -44,6 +44,16 @@ class ReportingTests(unittest.TestCase):
         self.assertIn("clinical_safety", report)
         self.assertIn("source_policy", report)
 
+    def test_zoledronic_acid_uses_curated_invima_sources(self):
+        report = build_drug_report(DB_PATH, "ACIDO ZOLEDRONICO", only_vigente=True)
+        indications = " ".join(item["indicaciones"] for item in report["invima"]["details"])
+
+        self.assertGreaterEqual(report["invima"]["details_count"], 2)
+        self.assertIn("hipercalcemia", indications.lower())
+        self.assertIn("neoplasias malignas avanzadas", indications.lower())
+        self.assertIsNotNone(report["clinical_safety"])
+        self.assertIn("POS Populi", report["completion"]["missing_sources"])
+
 
 if __name__ == "__main__":
     unittest.main()

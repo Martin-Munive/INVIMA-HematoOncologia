@@ -13,10 +13,11 @@ An indication is shown as an **INVIMA indication** only when it comes from an IN
 ## Source hierarchy
 
 1. **INVIMA detail pages**: primary source for indication text by product or presentation.
-2. **POS Populi**: source for UPC coverage or financing information.
-3. **UNIRS**: complementary source for enabled or referenced indications.
-4. **Local oncology profile**: curated local source for mechanism, adverse reactions, extravasation and summarized clinical notes.
-5. **Scientific literature and official drug monographs**: source for mechanism, toxicity, hypersensitivity, anaphylaxis and management when curated for a specific medication.
+2. **INVIMA source documents**: official actas, insertos or IPP documents curated when the detail page is not locally available.
+3. **POS Populi**: source for UPC coverage or financing information.
+4. **UNIRS**: complementary source for enabled or referenced indications.
+5. **Local oncology profile**: curated local source for mechanism, adverse reactions, extravasation and summarized clinical notes.
+6. **Scientific literature and official drug monographs**: source for mechanism, toxicity, hypersensitivity, anaphylaxis and management when curated for a specific medication.
 
 ## INVIMA access limits
 
@@ -31,6 +32,8 @@ Allowed local workflow:
 5. source and limitation display in the report.
 
 For detail imports, the pair `expediente + cdgprod` must come from the INVIMA results page or a permitted export that preserves those values.
+
+When a detail page is not available, an official INVIMA acta, inserto or IPP may be curated as a source document. The report must preserve the source label, URL and reference so the data is not confused with a downloaded detail-page record.
 
 ## Local data excluded from the repository
 

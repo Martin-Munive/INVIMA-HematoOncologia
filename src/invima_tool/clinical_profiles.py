@@ -94,7 +94,102 @@ PACLitaxel_SAFETY_PROFILE = {
 }
 
 
+ZOLEDRONIC_ACID_SAFETY_PROFILE = {
+    "drug": "ACIDO ZOLEDRONICO",
+    "source_status": "curated_from_external_scientific_sources",
+    "definition": "Bifosfonato nitrogenado usado para inhibir la resorcion osea osteoclastica y reducir complicaciones oseas relacionadas con cancer.",
+    "mechanism": "Se une a la hidroxiapatita del hueso e inhibe la farnesil pirofosfato sintasa en osteoclastos; esto altera la prenilacion de proteinas pequenas GTPasas, reduce la actividad osteoclastica y disminuye la resorcion osea y el calcio serico.",
+    "mechanism_sources": [
+        {
+            "label": "NCI Drug Dictionary - zoledronic acid",
+            "url": "https://www.cancer.gov/publications/dictionaries/cancer-drug/def/zoledronic-acid",
+        },
+        {
+            "label": "DailyMed zoledronic acid prescribing information",
+            "url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=zoledronic%20acid",
+        },
+    ],
+    "sources": [
+        {
+            "label": "Cancer Care Ontario zoledronic acid monograph",
+            "url": "https://www.cancercareontario.ca/drugformulary/drugs/zoledronicacid",
+        },
+        {
+            "label": "BC Cancer zoledronic acid monograph",
+            "url": "https://www.bccancer.bc.ca/drug-database-site/Drug%20Index/Zoledronic%20acid_monograph.pdf",
+        },
+        {
+            "label": "DailyMed zoledronic acid prescribing information",
+            "url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=zoledronic%20acid",
+        },
+    ],
+    "adverse_reactions_by_system": [
+        {
+            "system": "Metabolico / electrolitos",
+            "items": ["Hipocalcemia", "hipofosfatemia", "hipomagnesemia", "sintomas por reaccion de fase aguda"],
+        },
+        {
+            "system": "Renal",
+            "items": ["Elevacion de creatinina", "deterioro renal", "falla renal aguda rara", "proteinuria"],
+        },
+        {
+            "system": "Oseo / odontologico",
+            "items": ["Osteonecrosis de mandibula", "dolor oseo", "fracturas femorales atipicas raras"],
+        },
+        {
+            "system": "Neuromuscular",
+            "items": ["Mialgias", "artralgias", "dolor musculoesqueletico", "dolor de extremidades"],
+        },
+        {
+            "system": "General / infusion",
+            "items": ["Fiebre", "escalofrios", "sindrome gripal", "fatiga", "astenia"],
+        },
+        {
+            "system": "Gastrointestinal",
+            "items": ["Nauseas", "vomito", "diarrea", "dolor abdominal", "dispepsia"],
+        },
+        {
+            "system": "Ocular",
+            "items": ["Conjuntivitis", "uveitis", "escleritis", "dolor ocular"],
+        },
+        {
+            "system": "Inmunologico",
+            "items": ["Hipersensibilidad", "urticaria", "angioedema", "anafilaxia rara"],
+        },
+    ],
+    "hypersensitivity": {
+        "risk": "Las reacciones de hipersensibilidad son infrecuentes, pero se han reportado urticaria, angioedema y anafilaxia con zoledronato.",
+        "prevention": [
+            "Verificar antecedente de hipersensibilidad a acido zoledronico, excipientes u otros bifosfonatos.",
+            "Corregir hipocalcemia y evaluar funcion renal antes de la infusion.",
+        ],
+        "management": [
+            "Suspender la infusion ante reaccion inmediata significativa.",
+            "Evaluar via aerea, respiracion, circulacion y signos vitales.",
+            "Tratar anafilaxia segun protocolo institucional, incluyendo epinefrina si cumple criterios.",
+            "No reexponer sin evaluacion especializada si la reaccion fue severa.",
+        ],
+    },
+    "extravasation": {
+        "classification": "No antineoplasico vesicante; puede causar irritacion local por infusion intravenosa.",
+        "prevention": [
+            "Administrar por via intravenosa con acceso permeable y tiempo de infusion no menor al recomendado.",
+            "Evitar mezclar con soluciones que contienen calcio.",
+        ],
+        "management": [
+            "Suspender infusion si hay dolor, edema, eritema o infiltracion.",
+            "Retirar o manejar el acceso segun protocolo institucional de infiltracion no vesicante.",
+            "Elevar la extremidad, vigilar evolucion local y documentar el evento.",
+            "Escalar a farmacia/enfermeria oncologica si hay necrosis, dolor progresivo o compromiso funcional.",
+        ],
+    },
+}
+
+
 def get_clinical_safety_profile(query: str) -> dict | None:
-    if "PACLITAXEL" in query.upper():
+    key = query.upper()
+    if "PACLITAXEL" in key:
         return PACLitaxel_SAFETY_PROFILE
+    if "ZOLEDRONICO" in key or "ZOLEDRONIC" in key or "ZOLEDRONATO" in key:
+        return ZOLEDRONIC_ACID_SAFETY_PROFILE
     return None

@@ -57,6 +57,9 @@ type InvimaDetail = {
   concentracion: string;
   atc: string;
   indicaciones: string;
+  source_label?: string;
+  source_url?: string;
+  source_reference?: string;
 };
 
 type UnirsItem = {
@@ -147,6 +150,9 @@ const INDICATION_PATTERNS: { label: string; pattern: RegExp }[] = [
   { label: 'Cancer de pulmon no microcitico / NSCLC', pattern: /CANCER DE PULMON NO MICROCITICO|CANCER DE PULMON DE CELULAS NO[- ]PEQUENAS|NSCLC/i },
   { label: 'Adenocarcinoma de pancreas metastasico', pattern: /ADENOCARCINOMA DE PANCREAS METASTASICO/i },
   { label: 'Sarcoma de Kaposi relacionado con SIDA', pattern: /SARCOMA DE KAPOSI/i },
+  { label: 'Hipercalcemia maligna / por neoplasia', pattern: /HIPERCALCEMIA (MALIGNA|DE NEOPLASIA|INDUCIDA POR TUMOR|TUMORAL)/i },
+  { label: 'Neoplasias malignas avanzadas con afectacion osea', pattern: /NEOPLASIAS MALIGNAS AVANZADAS QUE AFECTAN (AL |EL )?HUESO|METASTASIS OSEAS|LESIONES OSTEOLITICAS|MIELOMA MULTIPLE/i },
+  { label: 'Prevencion de complicaciones oseas', pattern: /PREVENCION DE COMPLICACIONES OSEAS|FRACTURAS PATOLOGICAS|COMPRESION MEDULAR|RADIOTERAPIA O CIRUGIA OSEAS/i },
 ];
 
 const UNIRS_INDICATION_PATTERNS: { label: string; pattern: RegExp }[] = [
@@ -681,6 +687,12 @@ function App() {
                           <span>{item.concentracion}</span>
                         </div>
                         <p>{item.indicaciones}</p>
+                        {item.source_label && (
+                          <div className="source-note">
+                            Fuente: {item.source_url ? <a href={item.source_url} target="_blank" rel="noreferrer">{item.source_label}</a> : item.source_label}
+                            {item.source_reference ? ` (${item.source_reference})` : ''}
+                          </div>
+                        )}
                       </details>
                     ))}
                   </div>

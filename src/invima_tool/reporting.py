@@ -4,6 +4,7 @@ from pathlib import Path
 import sqlite3
 
 from .clinical_profiles import get_clinical_safety_profile
+from .curated_regulatory import get_curated_invima_details, get_curated_invima_suggestions
 from .storage import connect, init_db
 
 
@@ -66,6 +67,11 @@ def build_drug_suggestions(db_path: str | Path, query: str, *, limit: int = 12) 
                 item = candidates.setdefault(key, {"name": name, "sources": set(), "count": 0})
                 item["sources"].add(source)
                 item["count"] += int(row["n"] or 0)
+        for curated in get_curated_invima_suggestions():
+            key = curated["name"].upper()
+            item = candidates.setdefault(key, {"name": curated["name"], "sources": set(), "count": 0})
+            item["sources"].update(curated["sources"])
+            item["count"] += int(curated["count"])
     finally:
         con.close()
 
@@ -123,6 +129,15 @@ def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = F
         ]
         if only_vigente:
             details = [row for row in details if row["estado"] == "Vigente"]
+        curated_details = get_curated_invima_details(query)
+        if curated_details:
+            existing_keys = {(row["expediente"], row["producto"]) for row in details}
+            for detail in curated_details:
+                key = (detail["expediente"], detail["producto"])
+                if key not in existing_keys:
+                    details.append(detail)
+            if not registration_counts:
+                registration_counts = [{"estado": "Fuente INVIMA curada", "n": len(curated_details)}]
 
         unirs = [
             dict(row)
@@ -191,8 +206,8 @@ def build_drug_report(db_path: str | Path, query: str, *, only_vigente: bool = F
         "pospopuli": {"count": len(pos), "items": pos},
         "clinical_safety": get_clinical_safety_profile(query),
         "source_policy": {
-            "regulatory_indications_source": "INVIMA details only",
-            "registration_source": "INVIMA HTML results",
+            "regulatory_indications_source": "INVIMA details or curated INVIMA act/source documents",
+            "registration_source": "INVIMA HTML results or curated INVIMA source documents",
             "coverage_source": "POS Populi / UPC",
             "complementary_indications_source": "UNIRS",
             "manual_profile_source": "curated local oncology profile",

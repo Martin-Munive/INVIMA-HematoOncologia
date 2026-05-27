@@ -1,0 +1,458 @@
+{
+  "invima": [
+    {
+      "label": "Cancer de mama metastasico",
+      "pattern": "CANCER DE MAMA METASTASICO"
+    },
+    {
+      "label": "Cancer de mama",
+      "pattern": "CANCER DE MAMA(?! METASTASICO)|CARCINOMA DE MAMA|CARCINOMA AVANZADO DE SENO"
+    },
+    {
+      "label": "Cancer de ovario",
+      "pattern": "CANCER DE OVARIO|CANCER METASTASICO DEL OVARIO|CARCINOMA AVANZADO DEL OVARIO|CARCINOMA METASTASICO DE OVARIO|CANCER EPITELIAL DE OVARIO|CANCER OVARICO AVANZADO|CANCER OVARICO|CARCINOMA EPITELIAL DE OVARIO"
+    },
+    {
+      "label": "Cancer de pulmon no microcitico / NSCLC",
+      "pattern": "CANCER DE PULMON NO MICROCITICO|CANCER PULMONAR A CELULAS NO PEQUENAS|CANCER DE PULMON DE CELULAS NO[- ]PEQUENAS|NSCLC|CPCNP"
+    },
+    {
+      "label": "Mesotelioma pleural maligno",
+      "pattern": "MESOTELIOMA PLEURAL MALIGNO|MESOTELIOMA"
+    },
+    {
+      "label": "Adenocarcinoma de pancreas metastasico",
+      "pattern": "ADENOCARCINOMA DE PANCREAS METASTASICO"
+    },
+    {
+      "label": "Sarcoma de Kaposi relacionado con SIDA",
+      "pattern": "SARCOMA DE KAPOSI"
+    },
+    {
+      "label": "Hipercalcemia maligna / por neoplasia",
+      "pattern": "HIPERCALCEMIA (MALIGNA|DE NEOPLASIA|INDUCIDA POR TUMOR|TUMORAL)"
+    },
+    {
+      "label": "Neoplasias malignas avanzadas con afectacion osea",
+      "pattern": "NEOPLASIAS MALIGNAS AVANZADAS QUE AFECTAN (AL |EL )?HUESO|METASTASIS OSEAS|LESIONES OSTEOLITICAS|MIELOMA MULTIPLE"
+    },
+    {
+      "label": "Prevencion de complicaciones oseas",
+      "pattern": "PREVENCION DE COMPLICACIONES OSEAS|FRACTURAS PATOLOGICAS|COMPRESION MEDULAR|RADIOTERAPIA O CIRUGIA OSEAS"
+    },
+    {
+      "label": "Cancer colorrectal / colon / recto",
+      "pattern": "CANCER COLO?R?RECTAL|CANCER COLORRECTAL|CARCINOMA COLO?R?RECTAL|CANCER DE COLON O RECTO|CANCER DE COLON|CANCER DE RECTO|CARCINOMA METASTASICO DE COLON O RECTO|CANCER METASTASICO COLO?R?RECTAL|CANCER COLO?R?RECTAL METASTASICO|CCRM"
+    },
+    {
+      "label": "Cancer de pulmon de celulas pequenas",
+      "pattern": "CANCER DE PULMON DE CELULAS PEQUENAS|CANCER PULMONAR DE CELULAS PEQUENAS|CARCINOMA PULMONAR DE CELULAS PEQUENAS|CPCP"
+    },
+    {
+      "label": "Cancer renal / carcinoma de celulas renales",
+      "pattern": "CANCER RENAL|CARCINOMA DE CELULAS RENALES|CARCINOMA RENAL|CCR AVANZADO|CANCER RENAL AVANZADO"
+    },
+    {
+      "label": "Cancer de cuello uterino",
+      "pattern": "CARCINOMA DE CUELLO UTERINO|CANCER DE CUELLO UTERINO|CUELLO UTERINO PERSISTENTE|CUELLO UTERINO RECIDIVANTE"
+    },
+    {
+      "label": "Cancer urotelial / vejiga",
+      "pattern": "CANCER UROTELIAL|CARCINOMA UROTELIAL|CANCER AVANZADO DE VEJIGA|CANCER DE VEJIGA|CARCINOMA DE VEJIGA|CANCER NO MUSCULO INVASIVO DE VEJIGA|CANCER NO MUSCULO-INVASIVO DE VEJIGA"
+    },
+    {
+      "label": "Cancer hepatobiliar / via biliar",
+      "pattern": "CANCER HEPATOBILIAR|ADENOCARCINOMA HEPATOBILIAR|CANCER DE VIA BILIAR|CANCER DE VIAS BILIARES|COLANGIOCARCINOMA"
+    },
+    {
+      "label": "Carcinoma hepatocelular",
+      "pattern": "CARCINOMA HEPATOCELULAR|HEPATOCELULAR \\(HCC\\)|\\bHCC\\b|CARCINOMA DE CELULA HEPATICA|CARCINOMA HEPATICO"
+    },
+    {
+      "label": "Cancer de prostata",
+      "pattern": "CANCER DE PROSTATA|CARCINOMA DE PROSTATA|PROSTATA METASTASICO|PROSTATA AVANZADO"
+    },
+    {
+      "label": "Cancer testicular",
+      "pattern": "CANCER TESTICULAR|TUMORES TESTICULARES|CARCINOMA TESTICULAR"
+    },
+    {
+      "label": "Cancer de cabeza y cuello",
+      "pattern": "CANCER DE CABEZA Y CUELLO|CARCINOMA DE CELULAS ESCAMOSAS DE CABEZA Y CUELLO|CABEZA Y CUELLO"
+    },
+    {
+      "label": "Melanoma",
+      "pattern": "MELANOMA MALIGNO|MELANOMA AVANZADO|MELANOMA METASTASICO|MELANOMA"
+    },
+    {
+      "label": "Osteosarcoma",
+      "pattern": "OSTEOSARCOMA"
+    },
+    {
+      "label": "Glioma / glioblastoma",
+      "pattern": "GLIOMA MALIGNO|GLIOBLASTOMA MULTIFORME|GLIOBLASTOMA|GLIOMA"
+    },
+    {
+      "label": "Tumor de Wilms",
+      "pattern": "TUMOR DE WILMS|TUMORES DE WILMS"
+    },
+    {
+      "label": "Neuroblastoma",
+      "pattern": "NEUROBLASTOMA"
+    },
+    {
+      "label": "Retinoblastoma",
+      "pattern": "RETINOBLASTOMA"
+    },
+    {
+      "label": "Sarcomas / rabdomiosarcoma",
+      "pattern": "RABDOMIOSARCOMA|SARCOMAS?|TUMORES SOLIDOS"
+    },
+    {
+      "label": "Leucemia linfocitica aguda / LLA",
+      "pattern": "LEUCEMIA LINFOCITICA AGUDA|LEUCEMIA LINFOBLASTICA AGUDA|LLA PH\\+|\\bLLA\\b"
+    },
+    {
+      "label": "Leucemia mieloide aguda / LMA",
+      "pattern": "LEUCEMIA MIELOIDE AGUDA|LEUCEMIA MIELOGENA AGUDA|LEUCEMIA MIELOCITICA AGUDA|LEUCEMIA AGUDA MIELOIDE|\\bLMA\\b"
+    },
+    {
+      "label": "Leucemia mieloide cronica / LMC",
+      "pattern": "LEUCEMIA MIELOIDE CRONICA|LEUCEMIA MIELOCITICA CRONICA|\\bLMC\\b"
+    },
+    {
+      "label": "Leucemia mielomonocitica cronica / LMMC",
+      "pattern": "LEUCEMIA MIELOMONOCITICA CRONICA|\\bLMMC\\b|\\bCMML\\b"
+    },
+    {
+      "label": "Leucemia meningea",
+      "pattern": "LEUCEMIA MENINGEA"
+    },
+    {
+      "label": "Leucemia linfocitica cronica / LLC",
+      "pattern": "LEUCEMIA LINFOCITICA CRONICA|\\bLLC\\b|\\bCLL\\b"
+    },
+    {
+      "label": "Sindromes mielodisplasicos / SMD",
+      "pattern": "SINDROMES MIELODISPLASICOS|SINDROME MIELODISPLASICO|\\bSMD\\b|\\bMDS\\b"
+    },
+    {
+      "label": "Linfoma no Hodgkin",
+      "pattern": "LINFOMA NO HODGKIN|LINFOMA NO-HODGKIN|LINFOMA NO HODGKINIANO|\\bLNH\\b|LG-NHL|LINFOMA NO HODKING|LINFOMA NO HODKINGIANO|LINFOMA NO HODGKIN B"
+    },
+    {
+      "label": "Linfoma de Hodgkin",
+      "pattern": "LINFOMA DE HODGKIN|ENFERMEDAD DE HODGKIN"
+    },
+    {
+      "label": "Linfoma folicular",
+      "pattern": "LINFOMA FOLICULAR"
+    },
+    {
+      "label": "Linfoma de Burkitt",
+      "pattern": "LINFOMA DE BURKITT|BURKITT"
+    },
+    {
+      "label": "Linfoma difuso de celulas B grandes",
+      "pattern": "LINFOMA DIFUSO DE CELULAS B GRANDES|CELULAS B GRANDES|LDCBG|DLBCL"
+    },
+    {
+      "label": "Linfoma anaplasico",
+      "pattern": "LINFOMA ANAPLASICO"
+    },
+    {
+      "label": "Tumores trofoblasticos / coriocarcinoma",
+      "pattern": "TUMORES? DE TROFOBLASTO|CORIOCARCINOMA|CARIOCARCINOMA|MOLA HIDATIDIFORME"
+    },
+    {
+      "label": "Cancer de trompa de Falopio / carcinoma primario peritoneal",
+      "pattern": "CANCER DE TROMPA DE FALOPIO|CARCINOMA PRIMARIO DE SEROSAS|CARCINOMA PRIMARIO PERITONEAL|PERITONEAL PRIMARIO"
+    },
+    {
+      "label": "Tumores neuroendocrinos",
+      "pattern": "TUMORES? NEUROENDOCRINOS?|GEP-NETS|TUMORES CARCINOIDES|VIPOMAS"
+    },
+    {
+      "label": "Carcinoma adrenocortical",
+      "pattern": "CARCINOMA ADRENOCORTICAL"
+    },
+    {
+      "label": "Cancer hepatobiliar",
+      "pattern": "CANCER HEPATOBILIAR|ADENOCARCINOMA HEPATOBILIAR"
+    },
+    {
+      "label": "Cancer de canal anal",
+      "pattern": "CANCER DE CANAL ANAL|CARCINOMA ANAL|CANAL ANAL"
+    },
+    {
+      "label": "Cancer esofagico",
+      "pattern": "CANCER ESOFAGICO|CANCER DE ESOFAGO|CARCINOMA DE ESOFAGO"
+    },
+    {
+      "label": "Cancer de pancreas",
+      "pattern": "CANCER DE PANCREAS|ADENOCARCINOMA DE PANCREAS|PANCREAS METASTASICO|PANCREATICO|PANCREAS"
+    },
+    {
+      "label": "Osteoporosis",
+      "pattern": "OSTEOPOROSIS|FRACTURAS VERTEBRALES|FRACTURA DE CADERA|PERDIDA OSEA"
+    },
+    {
+      "label": "Artritis reumatoide",
+      "pattern": "ARTRITIS REUMATOIDEA?|ARTRITIS REUMATOIDE ACTIVA"
+    },
+    {
+      "label": "Artritis idiopatica juvenil",
+      "pattern": "ARTRITIS IDIOPATICA JUVENIL"
+    },
+    {
+      "label": "Artritis psoriasica",
+      "pattern": "ARTRITIS PSORIASICA|ARTRITIS SORIASICA"
+    },
+    {
+      "label": "Psoriasis",
+      "pattern": "PSORIASIS|SORIASIS"
+    },
+    {
+      "label": "Rechazo de trasplante / inmunosupresion",
+      "pattern": "RECHAZO DEL TRASPLANTE|RECHAZO DE ORGANOS|RECHAZO DEL INJERTO|INMUNOSUPRESION EN TRASPLANTE|PROFILAXIS DEL RECHAZO"
+    },
+    {
+      "label": "Enfermedad injerto contra huesped",
+      "pattern": "ENFERMEDAD INJERTO CONTRA HUESPED|INJERTO CONTRA HUESPED|EICH|GVHD"
+    },
+    {
+      "label": "Aplasia medular / anemia aplasica",
+      "pattern": "APLASIA MEDULAR|ANEMIA APLASICA"
+    },
+    {
+      "label": "Anemia dependiente de transfusion / talasemia",
+      "pattern": "ANEMIA DEPENDIENTE DE TRANSFUSIONES|BETATALASEMIA|B-TA"
+    },
+    {
+      "label": "Edema macular / degeneracion macular",
+      "pattern": "EDEMA MACULAR|DEGENERACION MACULAR|OCLUSIONES VENOSAS"
+    },
+    {
+      "label": "Esquizofrenia",
+      "pattern": "ESQUIZOFRENIA"
+    },
+    {
+      "label": "Trastorno bipolar / mania",
+      "pattern": "TRASTORNO BIPOLAR|MANIA BIPOLAR|EPISODIOS MANIACOS|EPISODIOS MANIATICOS"
+    },
+    {
+      "label": "Depresion / ansiedad",
+      "pattern": "TRASTORNO DEPRESIVO MAYOR|DEPRESION|TRASTORNO DE ANSIEDAD|ANSIEDAD GENERALIZADA|TRASTORNOS DE ANGUSTIA|ATAQUE DE PANICO|FOBIA SOCIAL|TRASTORNO OBSESIVO-COMPULSIVO|\\bTOC\\b"
+    },
+    {
+      "label": "Epilepsia / crisis convulsivas",
+      "pattern": "CRISIS COMPLEJAS PARCIALES|CRISIS DE AUSENCIA|MULTIPLES TIPOS DE CRISIS|EPILEPSIA|CONVULSIONES"
+    },
+    {
+      "label": "Migrana",
+      "pattern": "MIGRANA|CEFALEAS DEL TIPO MIGRANA"
+    },
+    {
+      "label": "Infecciones bacterianas",
+      "pattern": "INFECCIONES CAUSADAS POR BACTERIAS|INFECCIONES CAUSADAS POR GERMENES|INFECCIONES BACTERIANAS|OTITIS EXTERNAS|OTITIS MEDIA|NEUTROPENIA FEBRIL"
+    },
+    {
+      "label": "Infecciones fungicas sistemicas",
+      "pattern": "INFECCIONES SISTEMICAS POR CANDIDA|ASPERGILOSIS|FUSARIUM|SCEDOSPORIUM"
+    },
+    {
+      "label": "Citomegalovirus / CMV",
+      "pattern": "CITOMEGALOVIRUS|\\bCMV\\b|RETINITIS POR CMV"
+    },
+    {
+      "label": "Carcinoma nasofaringeo",
+      "pattern": "CARCINOMA NASO[- ]FARINGEO|CANCER NASOFARINGEO|NASOFARINGEO METASTASICO"
+    },
+    {
+      "label": "Tumor de celulas de la granulosa",
+      "pattern": "TUMOR DE CELULAS DE LA GRANULOSA|TUMOR DE CELULAS GRANULOSA"
+    },
+    {
+      "label": "Feocromocitoma",
+      "pattern": "FEOCROMOCITOMA"
+    },
+    {
+      "label": "Enfermedades cutaneas precancerosas",
+      "pattern": "ENFERMEDADES CUTANEAS PRECANCEROSAS|QUERATOSIS ACTINICA|LESIONES CUTANEAS PRECANCEROSAS|QUERATOSIS SOLAR|QUERATOSIS SENIL|ENFERMEDAD DE BOWEN|EPITELIOMAS VASOCELULARES|ESTADOS PRECANCEROSOS|RADIODERMATITIS"
+    },
+    {
+      "label": "Melanosis/neoplasia corneal o conjuntival",
+      "pattern": "MELANOSIS CORNEAL|MELANOSIS CONJUNTIVAL|NEOPLASIA MELANOCITICA CONJUNTIVAL|NEOPLASIA MELANOCITICA"
+    },
+    {
+      "label": "Purpura trombocitopenica inmune",
+      "pattern": "PURPURA TROMBOCITOPENICA INMUNE|PURPURA TROMBOCITOPENICA IDIOPATICA|\\bPTI\\b|\\bITP\\b"
+    },
+    {
+      "label": "Trastornos linfoproliferativos postrasplante",
+      "pattern": "TRASTORNOS LINFOPROLIFERATIVOS POSTRASPLANTE|LINFOPROLIFERATIVOS POSTRASPLANTE|PTLD"
+    },
+    {
+      "label": "Glomerulonefritis / nefropatia membranosa",
+      "pattern": "GLOMERULONEFRITIS|NEFROPATIA MEMBRANOSA|SINDROME NEFROTICO"
+    },
+    {
+      "label": "Hipertension pulmonar",
+      "pattern": "HIPERTENSION ARTERIAL PULMONAR|HIPERTENSION PULMONAR"
+    },
+    {
+      "label": "Disfuncion erectil",
+      "pattern": "DISFUNCION ERECTIL"
+    },
+    {
+      "label": "Fenomeno de Raynaud",
+      "pattern": "RAYNAUD"
+    },
+    {
+      "label": "Inmunodeficiencia primaria/secundaria",
+      "pattern": "INMUNODEFICIENCIA PRIMARIA|INMUNODEFICIENCIA SECUNDARIA|INMUNODEFICIENCIA HUMORAL|TERAPIA DE REEMPLAZO"
+    },
+    {
+      "label": "Sindrome de Guillain-Barre",
+      "pattern": "GUILLAIN[- ]?BARRE|GUILLAN BARRE"
+    },
+    {
+      "label": "Enfermedad de Kawasaki",
+      "pattern": "ENFERMEDAD DE KAWASAKI|KAWASAKI"
+    },
+    {
+      "label": "Profilaxis hepatitis B",
+      "pattern": "PROFILAXIS CONTRA LA HEPATITIS B|HEPATITIS B|VIRUS DE LA HEPATITIS B"
+    },
+    {
+      "label": "Profilaxis Rh / enfermedad hemolitica perinatal",
+      "pattern": "RH\\(D\\)-NEGATIVAS|PROFILAXIS PRENATAL|HEMORRAGIA TRANSPLACENTARIA|INCOMPATIBILIDAD RH"
+    },
+    {
+      "label": "Esclerosis sistemica / escleroderma",
+      "pattern": "ESCLEROSIS SISTEMICA|ESCLERODERMA"
+    },
+    {
+      "label": "Lupus eritematoso sistemico",
+      "pattern": "LUPUS ERITEMATOSO SISTEMICO|LUPUS ERITEMATOSO DISCOIDE|LUPUS ERITEMATOSO REFRACTARIO|LUPUS ERITEMATOSO"
+    },
+    {
+      "label": "Enfermedad de Behcet",
+      "pattern": "BEHCET"
+    },
+    {
+      "label": "Parkinson con psicosis",
+      "pattern": "PARKINSON"
+    },
+    {
+      "label": "Trastorno afectivo organico",
+      "pattern": "TRASTORNO AFECTIVO ORGANICO"
+    },
+    {
+      "label": "Retardo mental / trastornos de conducta",
+      "pattern": "RETARDO MENTAL|DESORDENES DE LA CONDUCTA|TRASTORNOS DE CONDUCTA|AUTISMO"
+    },
+    {
+      "label": "Acromegalia",
+      "pattern": "ACROMEGALIA"
+    },
+    {
+      "label": "Carcinoma de Merkel",
+      "pattern": "CARCINOMA DE MERKEL"
+    },
+    {
+      "label": "Cancer hepatobiliar avanzado",
+      "pattern": "ADENOCARCINOMA HEPATOBILIAR AVANZADO"
+    },
+    {
+      "label": "Trombocitopenia",
+      "pattern": "TROMBOCITOPENIA"
+    },
+    {
+      "label": "Estimulo con tirotropina",
+      "pattern": "ESTIMULACION PRETERAPEUTICA|TIROTROPINA"
+    },
+    {
+      "label": "Linfomas",
+      "pattern": "LINFOMAS EN ADULTOS|LINFOMAS MALIGNOS|\\bLINFOMAS\\b|\\bLINFOMA\\b"
+    },
+    {
+      "label": "Tumores malignos gastrointestinales/mama/pancreas",
+      "pattern": "TUMORES MALIGNOS, PRINCIPALMENTE DEL RECTO|CARCINOMA COLON, RECTO, MAMA, ESTOMAGO Y PANCREAS|RECTO, COLON, MAMA, ESTOMAGO Y PANCREAS"
+    },
+    {
+      "label": "Verrugas cutaneas",
+      "pattern": "VERRUGAS CUTANEAS"
+    },
+    {
+      "label": "Neoplasia escamosa de superficie ocular",
+      "pattern": "NEOPLASIA ESCAMOSA DE LA SUPERFICIE OCULAR"
+    },
+    {
+      "label": "Anemia hemolitica autoinmune",
+      "pattern": "ANEMIA HEMOLITICA AUTOINMUNE"
+    },
+    {
+      "label": "Enfermedades desmielinizantes autoinmunes",
+      "pattern": "ENFERMEDADES DESMIELINIZANTES AUTOINMUNES|ESCLEROSIS MULTIPLE|ANTIMOG"
+    },
+    {
+      "label": "Neuromielitis optica",
+      "pattern": "NEUROMIELITIS OPTICA|ESPECTRO DE NEUROMIELITIS OPTICA"
+    },
+    {
+      "label": "Cancer ovarico avanzado",
+      "pattern": "CANCER OVARICO AVANZADO"
+    },
+    {
+      "label": "Tumores malignos",
+      "pattern": "TUMORES MALIGNOS"
+    },
+    {
+      "label": "Dermatitis atopica",
+      "pattern": "DERMATITIS ATOPICA"
+    },
+    {
+      "label": "Miopatias inflamatorias",
+      "pattern": "MIOPATIAS INFLAMATORIAS"
+    },
+    {
+      "label": "Sindrome antifosfolipido",
+      "pattern": "SINDROME ANTIFOSFOLIPIDO"
+    }
+  ],
+  "unirsExtra": [
+    {
+      "label": "Adenocarcinoma de primario desconocido",
+      "pattern": "ADENOCARCINOMA DE PRIMARIO DESCONOCIDO|CARCINOMAS? DE ORIGEN PRIMARIO DESCONOCIDO"
+    },
+    {
+      "label": "Cancer de vejiga metastasico",
+      "pattern": "CANCER DE VEJIGA METASTASICO|VEJIGA METASTASICO"
+    },
+    {
+      "label": "Cancer de cervix",
+      "pattern": "CANCER DE CERVIX|CANCER CERVIX|CERVIX, PERSISTENTE O RECURRENTE"
+    },
+    {
+      "label": "Cancer de endometrio",
+      "pattern": "CANCER DE ENDOMETRIO"
+    },
+    {
+      "label": "Cancer de esofago",
+      "pattern": "CANCER ESOFAGO|CANCER DE ESOFAGO"
+    },
+    {
+      "label": "Cancer gastrico",
+      "pattern": "CANCER GASTRICO"
+    },
+    {
+      "label": "Cancer de ovario resistente a platinos",
+      "pattern": "CANCER DE OVARIO RESISTENTE A PLATINOS|OVARIO RESISTENTE A PLATINOS"
+    },
+    {
+      "label": "Malignidad timica / timoma",
+      "pattern": "MALIGNIDAD TIMICA|MALIGNIDADES TIMICAS|TIMOMAS?|CARCINOMAS TIMICOS"
+    }
+  ]
+}

@@ -25,6 +25,7 @@ data/
 # These can include official pages, spreadsheets, local exports, CAPTCHA-session
 # artifacts or files whose redistribution status must be reviewed separately.
 Datos brutos/
+DATOS_BRUTOS/
 raw/
 fixtures/private/
 
